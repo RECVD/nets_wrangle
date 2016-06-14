@@ -33,9 +33,9 @@ code_rename = ['DunsNumber', '1990', '1991', '1992', '1993', '1994', '1995', '19
 def readfile():
     while True:
         try:
-            #Tk().withdraw()
-            #filename = askopenfilename()
-            filename = "E:\NETS_Clients2013ASCI\NETS2013_Sales.txt"
+            Tk().withdraw()
+            filename = askopenfilename()
+            # filename = "E:\NETS_Clients2013ASCI\NETS2013_Sales.txt"
             sales_it = pd.read_table(filename, iterator=True, usecols=sales_names, chunksize=100)  # remove hard coded chunksize later
             salesc_it = pd.read_table(filename, iterator=True, usecols=code_names, chunksize=100)
             break
@@ -44,24 +44,17 @@ def readfile():
 
     return sales_it, salesc_it
 
-# Set values for first melt - Numeric Sales Value
+# Set values to keep and melt on, add to JSON config file later
 ids_sales = ['DunsNumber', 'SalesGrowth', 'SalesGrowthPeer']
 ids_c = ['DunsNumber']
 values_sales = ['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002',
                 '2003','2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013']
 values_c = ['c' + x for x in values_sales]
 
-
 def main():
     sales_it, salesc_it = readfile()
     for sales_chunk, code_chunk in it.izip(sales_it, salesc_it):
-        """
-        try:
-            sales_chunk.columns = colnames
-        except ValueError:
-            print('File is not correctly formatted SIC File')
-            break
-        """
+
         # rename column names to have year in format YYYY
         sales_chunk.columns = sales_rename
         code_chunk.columns = code_rename
@@ -73,21 +66,14 @@ def main():
         melted_c = pd.melt(code_chunk, id_vars=ids_c, value_vars=values_sales,
                                var_name="Year", value_name="SalesC")  # melt code from wide to long format
 
-        joined = pd.merge(melted_sales, melted_c, on="DunsNumber")
-        temp = joined.dropna(subset={'Sales'})
-        #joined.sort_values(['DunsNumber', 'Year'], inplace=True)  # sort by DUNS and Year
-        #melted.reset_index(inplace=True, drop=True)  # drop added index
+        joined = pd.merge(melted_sales, melted_c, on=["DunsNumber", "Year"], how='left')
+        joined = joined.dropna(subset={'Sales'}) #remove empty rows
+        joined.sort_values(['DunsNumber', 'Year'], inplace=True)  # sort by DUNS and Year
 
-        final = melted_sales.join(melted_c)
-        final.sort_values(["DunsNumber", "Year"], inplace=True)
-        #final.dropna(subset={'Sales'}, inplace=True)
-        #print(final)
-        final.to_csv(outpath, sep='\t')
+        joined.to_csv(outpath, sep='\t')
 
         break  # end for testing purposes
 
-
-# cProfile.run('main()', 'profile.prof')
 
 if __name__ == '__main__':
     main()
