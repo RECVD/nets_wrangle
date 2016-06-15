@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import pandas as pd
 import itertools as it
-import cProfile
 from Tkinter import Tk  # file selection through GUI
 from tkFileDialog import askopenfilename  # ^^
 
