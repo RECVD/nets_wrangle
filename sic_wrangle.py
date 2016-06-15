@@ -78,4 +78,5 @@ def main():
         break  # end for testing purposes
 
 
-cProfile.run('main()', 'profile.prof')
+if __name__ == "__main__":
+    main()
