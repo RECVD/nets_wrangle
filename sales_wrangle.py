@@ -69,6 +69,7 @@ def main():
         joined = pd.merge(melted_sales, melted_c, on=["DunsNumber", "Year"], how='left')
         joined = joined.dropna(subset={'Sales'}) #remove empty rows
         joined.sort_values(['DunsNumber', 'Year'], inplace=True)  # sort by DUNS and Year
+        joined.reset_index(drop=True, inplace=True)
 
         joined.to_csv(outpath, sep='\t')
 
