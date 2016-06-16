@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import itertools as it
+import time
 
 
 # hard coded portion for testing, JSON later
@@ -29,7 +30,7 @@ melt_values = ['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '
 
 # new column names that include year format YYYY for standardization
 new_colnames = [0]* len(dnbr_rating_names)
-for i, x in enumerate(dnbr_rating_names):
+for i, x in enumerate(dnbr_rating_names): #skip Duns(index for pd) and start at first year
     if x[-2] == '9':
         new_colnames[i] = '19' + x[-2:]
     elif x[-2] == '0' or x[-2] == '1':
@@ -50,11 +51,9 @@ def readfile():
     while True:
         try:
             # remember to remove hard coded chunk size later
-            dnbr_rating_it = pd.read_table(filename, iterator=True, usecols=dnbr_rating_names, chunksize=100)
-            paydexmax_it = pd.read_table(filename, iterator=True, usecols=paydexmax_names, chunksize=100)
-            paydexmin_it = pd.read_table(filename, iterator=True, usecols=paydexmin_names, chunksize=100)
-
-            dnbr_rating_it.get_chunk().columns  # simple check for validity of iterator, lots of overhead, bad for the future
+            dnbr_rating_it = pd.read_table(filename, iterator=True, usecols=dnbr_rating_names, chunksize=1000)
+            paydexmax_it = pd.read_table(filename, iterator=True, usecols=paydexmax_names, chunksize=1000)
+            paydexmin_it = pd.read_table(filename, iterator=True, usecols=paydexmin_names, chunksize=1000)
             break
 
         except Exception:
@@ -84,9 +83,6 @@ def main():
 
         join1 = melted_dnbr.join(melted_dexmax, how='outer')
         joined = join1.join(melted_dexmin, how='outer')
-        # joined = joined.dropna(subset={'Sales'}) #remove empty rows
-        # joined.sort_values(['DunsNumber', 'Year'], inplace=True)  # sort by DUNS and Year
-        # joined.set_index(['DunsNumber', 'Year'], inplace=True)
         joined.dropna(inplace=True, how='all')
 
         joined.to_csv(outpath, sep='\t')
@@ -96,4 +92,6 @@ def main():
 
 
 if __name__ == "__main__":
+    t0 = time.clock()
     main()
+    print time.clock() - t0
