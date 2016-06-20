@@ -49,19 +49,22 @@ def w2l(delim_type):
 
     with open('temp.txt') as f, open('out.csv', 'w') as f2:
 
-        strip = f.readline().strip().split(delim)
+        strip = f.readline().strip().split(delim) #first line
+
+        #compute column names
         colnames = remove_duplicates([x[:-2] if x[-2] == '9' or x[-2] == '0' else x for x in strip])
-        colnames.insert(1, 'Year')
+        colnames.insert(1, 'Year') # add 'Year" as second element
         f2.write(delim.join(colnames) + '%s \n' % delim)
-        _, line1 = strip[0], strip[1:]
-        headers = ['19' + h[1:] if h[-2] == '9' else '20' + h[1:] for h in line1]
-        numyrs = len(set(headers))
+
+        _, line1 = strip[0], strip[1:] # remove first element (DunsNumber)
+        years = ['19' + h[1:] if h[-2] == '9' else '20' + h[1:] for h in line1] # convert to 'YYYY' format
+        numyrs = len(set(years)) # number of unique years
 
         for i, line in enumerate(f):
             strip = line.strip().split(delim)
-            key, rest = strip[0], strip[1:]
-            restsplit = splitlist(numyrs, rest)
-            for year, values in zip(headers, restsplit):
+            key, rest = strip[0], strip[1:] #separate key from the rest of the line
+            restsplit = splitlist(numyrs, rest) #split into equal lists
+            for year, values in zip(years, restsplit):
                 f2.write(delim.join([key, year, delim.join(values)]) + '%s \n' % delim)
 
 if __name__ == '__main__':
