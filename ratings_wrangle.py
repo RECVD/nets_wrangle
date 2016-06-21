@@ -27,7 +27,7 @@ def remove_duplicates(seq):
     return [x for x in seq if not (x in seen or seen_add(x))]
 
 
-def w2l(delim_type):
+def w2l(filepath, delim_type):
     """
     Convert data from wide to long format based on dated variables.
     It is assumed the last two characters of any dated variable is the last two digits of the
@@ -47,7 +47,7 @@ def w2l(delim_type):
         # else: print("Please specify 'csv' or 'txt'")
         #   continue
 
-    with open('temp.txt') as f, open('out.csv', 'w') as f2:
+    with open(filepath) as f, open('out.csv', 'w') as f2:
 
         strip = f.readline().strip().split(delim) #first line
 
@@ -73,4 +73,4 @@ def w2l(delim_type):
                 f2.write(delim.join([key, year, delim.join(timevals), delim.join(nontimevals)]) + '%s \n' % delim)
 
 if __name__ == '__main__':
-    w2l(',')
+    w2l(filename, ',')
