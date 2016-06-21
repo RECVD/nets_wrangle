@@ -62,8 +62,8 @@ def w2l(filepath, delim_type, linelimit):
         preyears, nonyears = [x for x in strip[1:] if x[-2] in decades], \
                              [x for x in strip[1:] if x[-2] not in decades]
 
-        years = ['19' + h[1:] if h[-2] == '9' else '20' + h[1:] for h in preyears] # convert to 'YYYY' format
-        numyrs = len(set(years)) # number of unique years
+        years = ['19' + h[-2:] if h[-2] == '9' else '20' + h[-2:] for h in preyears] # convert to 'YYYY' format
+          numyrs = len(set(years)) # number of unique years
 
         for i, line in enumerate(f):
             if i<= linelimit:
