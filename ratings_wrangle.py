@@ -51,7 +51,7 @@ def w2l(delim_type):
 
         strip = f.readline().strip().split(delim) #first line
 
-        decades = ('0', '1', '9')
+        decades = ('0', '1', '9') #decade digit in YYYY
 
         #compute column names
         colnames = remove_duplicates([x[:-2] if x[-2] in decades else x for x in strip])
@@ -67,10 +67,10 @@ def w2l(delim_type):
 
         for i, line in enumerate(f):
             strip = line.strip().split(delim)
-            key, rest, = strip[0], strip[1:] #separate key from the rest of the line
-            restsplit = splitlist(numyrs, rest) #split into equal lists
-            for year, values in zip(years, restsplit):
-                f2.write(delim.join([key, year, delim.join(values)]) + '%s \n' % delim)
+            key, time, nontime = strip[0], strip[1:len(years)+1], [strip[len(years)+1:]]*len(years) #separate key from the rest of the line
+            timesplit = splitlist(numyrs, time) #split into equal lists
+            for year, timevals, nontimevals in zip(years, timesplit, nontime):
+                f2.write(delim.join([key, year, delim.join(timevals), delim.join(nontimevals)]) + '%s \n' % delim)
 
 if __name__ == '__main__':
     w2l(',')
