@@ -51,18 +51,23 @@ def w2l(delim_type):
 
         strip = f.readline().strip().split(delim) #first line
 
+        decades = ('0', '1', '9')
+
         #compute column names
-        colnames = remove_duplicates([x[:-2] if x[-2] == '9' or x[-2] == '0' else x for x in strip])
+        colnames = remove_duplicates([x[:-2] if x[-2] in decades else x for x in strip])
         colnames.insert(1, 'Year') # add 'Year" as second element
         f2.write(delim.join(colnames) + '%s \n' % delim)
 
-        _, line1 = strip[0], strip[1:] # remove first element (DunsNumber)
-        years = ['19' + h[1:] if h[-2] == '9' else '20' + h[1:] for h in line1] # convert to 'YYYY' format
+        # split into time-based columns and non-time based, don't include key
+        preyears, nonyears = [x for x in strip[1:] if x[-2] in decades], \
+                             [x for x in strip[1:] if x[-2] not in decades]
+
+        years = ['19' + h[1:] if h[-2] == '9' else '20' + h[1:] for h in preyears] # convert to 'YYYY' format
         numyrs = len(set(years)) # number of unique years
 
         for i, line in enumerate(f):
             strip = line.strip().split(delim)
-            key, rest = strip[0], strip[1:] #separate key from the rest of the line
+            key, rest, = strip[0], strip[1:] #separate key from the rest of the line
             restsplit = splitlist(numyrs, rest) #split into equal lists
             for year, values in zip(years, restsplit):
                 f2.write(delim.join([key, year, delim.join(values)]) + '%s \n' % delim)
