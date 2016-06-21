@@ -27,7 +27,7 @@ def remove_duplicates(seq):
     return [x for x in seq if not (x in seen or seen_add(x))]
 
 
-def w2l(delim_type):
+def w2l(delim_type, linelimit):
     """
     Convert data from wide to long format based on dated variables.
     It is assumed the last two characters of any dated variable is the last two digits of the
@@ -66,11 +66,14 @@ def w2l(delim_type):
         numyrs = len(set(years)) # number of unique years
 
         for i, line in enumerate(f):
-            strip = line.strip().split(delim)
-            key, time, nontime = strip[0], strip[1:len(years)+1], [strip[len(years)+1:]]*len(years) #separate key from the rest of the line
-            timesplit = splitlist(numyrs, time) #split into equal lists
-            for year, timevals, nontimevals in zip(years, timesplit, nontime):
-                f2.write(delim.join([key, year, delim.join(timevals), delim.join(nontimevals)]) + '%s \n' % delim)
+            if i<= linelimit:
+                strip = line.strip().split(delim)
+                key, time, nontime = strip[0], strip[1:len(years)+1], [strip[len(years)+1:]]*len(years) #separate key from the rest of the line
+                timesplit = splitlist(numyrs, time) #split into equal lists
+                for year, timevals, nontimevals in zip(years, timesplit, nontime):
+                    f2.write(delim.join([key, year, delim.join(timevals), delim.join(nontimevals)]) + '%s \n' % delim)
+
+            else: break
 
 if __name__ == '__main__':
-    w2l(',')
+    w2l(',', 1000)
