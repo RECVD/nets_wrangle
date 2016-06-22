@@ -2,7 +2,7 @@ from __future__ import print_function
 
 filename = "E:\NETS_Clients2013ASCI\NETS2013_Sales.txt"
 
-def splitlist(numsplits,list):
+def splitlist(numsplits,l):
     """
     Split List into sub-lists of equal size whilst preserving order
     ------------
@@ -11,13 +11,9 @@ def splitlist(numsplits,list):
     list:  original list to be split
     """
 
-    l = [0]*numsplits
-    for i in xrange(numsplits):
-        try:
-            l[i] = list[i::numsplits]
-        except IndexError as e:
-            print(e.message)
-    return l
+    for i in range(0, len(l), numsplits):
+        yield l[i:i+numsplits]
+
 
 
 def remove_duplicates(seq):
@@ -47,7 +43,7 @@ def w2l(filepath, delim_type, linelimit):
         # else: print("Please specify 'csv' or 'txt'")
         #   continue
 
-    with open(filepath) as f, open('out.csv', 'w') as f2:
+    with open(filepath) as f, open('out.txt', 'w') as f2:
 
         strip = f.readline().strip().split(delim) #first line
 
@@ -62,22 +58,24 @@ def w2l(filepath, delim_type, linelimit):
         preyears, nonyears = [x for x in strip[1:] if x[-2] in decades], \
                              [x for x in strip[1:] if x[-2] not in decades]
 
-        years = ['19' + h[-2:] if h[-2] == '9' else '20' + h[-2:] for h in preyears] # convert to 'YYYY' format
-<<<<<<< Updated upstream
-          numyrs = len(set(years)) # number of unique years
-=======
-        numyrs = len(set(years)) # number of unique years
->>>>>>> Stashed changes
+        allyears = ['19' + h[-2:] if h[-2] == '9' else '20' + h[-2:] for h in preyears] # convert to 'YYYY' format
+        uyears = remove_duplicates(allyears)
+
+        num_all_years = len(allyears) #number of total year-based columns
+        numw2l = num_all_years/len(uyears) #number of vars to go from wide to long
 
         for i, line in enumerate(f):
             if i<= linelimit:
                 strip = line.strip().split(delim)
-                key, time, nontime = strip[0], strip[1:len(years)+1], [strip[len(years)+1:]]*len(years) #separate key from the rest of the line
-                timesplit = splitlist(numyrs, time) #split into equal lists
-                for year, timevals, nontimevals in zip(years, timesplit, nontime):
-                    f2.write(delim.join([key, year, delim.join(timevals), delim.join(nontimevals)]) + '%s \n' % delim)
-
+                key, time, nontime = strip[0], strip[1:num_all_years+1], [strip[num_all_years+1:]]*num_all_years #separate key from the rest of the line
+                timesplit = splitlist(numw2l, time) #split into equal lists
+    
+                for year, timevals, nontimevals in zip(uyears, timesplit, nontime):
+                    if any(timevals): #if the long to wide values are not empty
+                        f2.write(delim.join([key, year, delim.join(timevals), delim.join(nontimevals)]) + '%s \n' % delim)
+                    else:
+                        continue
             else: break
 
 if __name__ == '__main__':
-    w2l('temp.txt', ',', 1000)
+    w2l(filename, 'tab', 10)
