@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-filename = "E:\NETS_Clients2013ASCI\NETS2013_Ratings.txt"
+filename = "E:\NETS_Clients2013ASCI\NETS2013_Sales.txt"
 
 def splitlist(numsplits,list):
     """
@@ -63,7 +63,11 @@ def w2l(filepath, delim_type, linelimit):
                              [x for x in strip[1:] if x[-2] not in decades]
 
         years = ['19' + h[-2:] if h[-2] == '9' else '20' + h[-2:] for h in preyears] # convert to 'YYYY' format
+<<<<<<< Updated upstream
           numyrs = len(set(years)) # number of unique years
+=======
+        numyrs = len(set(years)) # number of unique years
+>>>>>>> Stashed changes
 
         for i, line in enumerate(f):
             if i<= linelimit:
@@ -76,4 +80,4 @@ def w2l(filepath, delim_type, linelimit):
             else: break
 
 if __name__ == '__main__':
-    w2l(filename, ',', 1000)
+    w2l('temp.txt', ',', 1000)
