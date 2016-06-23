@@ -2,7 +2,7 @@ from __future__ import print_function
 from itertools import chain
 import time
 
-filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Ratings.txt"
+filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_HQs.txt"
 
 def splitlist(numsplits,l):
     """
@@ -46,23 +46,23 @@ def w2l(filepath, delim_type, linelimit):
 
     with open(filepath) as f, open('out.txt', 'w') as f2:
 
-        strip = f.readline().strip().split(delim) #first line
+        strip1 = f.readline().strip().split(delim) #first line
 
         decades = ('0', '1', '9') #decade digit in YYYY
 
         # split into time-based columns and non-time based, don't include key
-        preyears, nonyears = [x for x in strip[1:] if x[-2] in decades], \
-                             [x for x in strip[1:] if x[-2] not in decades]
+        preyears, nonyears = [x for x in strip1[1:] if x[-2] in decades], \
+                             [x for x in strip1[1:] if x[-2] not in decades]
 
         yearvars = remove_duplicates([x[:-2] for x in preyears])
 
         #compute column names
-        colnames = list(chain.from_iterable([[strip[0]], yearvars, nonyears]))
+        colnames = list(chain.from_iterable([[strip1[0]], yearvars, nonyears]))
         colnames.insert(1, 'Year') # add 'Year" as second element
         f2.write(delim.join(colnames) + '%s \n' % delim)
 
-        year_i = [strip.index(x) for x in preyears]
-        nonyear_i = [strip.index(x) for x in nonyears]
+        year_i = [strip1.index(x) for x in preyears]
+        nonyear_i = [strip1.index(x) for x in nonyears]
 
         allyears = ['19' + h[-2:] if h[-2] == '9' else '20' + h[-2:] for h in preyears] # convert to 'YYYY' format
         uyears = remove_duplicates(allyears)
@@ -75,9 +75,12 @@ def w2l(filepath, delim_type, linelimit):
             strip = line.strip().split(delim)
             try:
                 key, time, nontime = strip[0], [strip[i] for i in year_i], [[strip[i] for i in nonyear_i]]*num_all_years #separate key from the rest of the line
-            except IndexError: #caused by a line having only a key or not enough values values, skip it
-                j+=1
-                continue
+            except IndexError: #caused by a line having only a key or not enough values, pad it with empty vals
+                padding = ["" for i in range(len(strip1)-len(strip))]
+                padded = strip + padding
+                key, time, nontime = padded[0], [padded[i] for i in year_i], [
+                    [padded[i] for i in nonyear_i]] * num_all_years
+                j = j+1
 
             timesplit = splitlist(numw2l, time) #split into equal lists
 
@@ -86,10 +89,10 @@ def w2l(filepath, delim_type, linelimit):
                     f2.write(delim.join([key, year, delim.join(timevals), delim.join(nontimevals)]) + '%s \n' % delim)
                 else:
                     continue
-        print("Values eliminated due to missing data: " + str(j))
+        print("Values padded due to missing data: " + str(j))
 
 if __name__ == '__main__':
     t0 = time.time()
-    w2l(filename, 'tab', 1*10**6)
+    w2l(filename, 'tab', 1*10**3)
     t1 = time.time()
     print(t1-t0)
