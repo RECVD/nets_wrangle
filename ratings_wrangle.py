@@ -2,7 +2,7 @@ from __future__ import print_function
 from itertools import chain
 import time
 
-filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Sales.txt"
+filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Ratings.txt"
 
 def splitlist(numsplits,l):
     """
@@ -70,9 +70,15 @@ def w2l(filepath, delim_type, linelimit):
         num_all_years = len(allyears) #number of total year-based columns
         numw2l = num_all_years/len(uyears) #number of vars to go from wide to long
 
+        j = 0 # count of eliminated rows
         for _, line in zip(xrange(linelimit), f):
             strip = line.strip().split(delim)
-            key, time, nontime = strip[0], [strip[i] for i in year_i], [[strip[i] for i in nonyear_i]]*num_all_years #separate key from the rest of the line
+            try:
+                key, time, nontime = strip[0], [strip[i] for i in year_i], [[strip[i] for i in nonyear_i]]*num_all_years #separate key from the rest of the line
+            except IndexError: #caused by a line having only a key or not enough values values, skip it
+                j+=1
+                continue
+
             timesplit = splitlist(numw2l, time) #split into equal lists
 
             for year, timevals, nontimevals in zip(uyears, timesplit, nontime):
@@ -80,10 +86,10 @@ def w2l(filepath, delim_type, linelimit):
                     f2.write(delim.join([key, year, delim.join(timevals), delim.join(nontimevals)]) + '%s \n' % delim)
                 else:
                     continue
-
+        print("Values eliminated due to missing data: " + str(j))
 
 if __name__ == '__main__':
     t0 = time.time()
-    w2l(filename, 'tab', 1*10*5)
+    w2l(filename, 'tab', 1*10**6)
     t1 = time.time()
     print(t1-t0)
