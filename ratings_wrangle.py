@@ -1,6 +1,8 @@
 from __future__ import print_function
+from itertools import chain
+import time
 
-filename = "E:\NETS_Clients2013ASCI\NETS2013_Sales.txt"
+filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Sales.txt"
 
 def splitlist(numsplits,l):
     """
@@ -13,7 +15,6 @@ def splitlist(numsplits,l):
 
     for i in range(0, len(l), numsplits):
         yield l[i:i+numsplits]
-
 
 
 def remove_duplicates(seq):
@@ -49,14 +50,19 @@ def w2l(filepath, delim_type, linelimit):
 
         decades = ('0', '1', '9') #decade digit in YYYY
 
-        #compute column names
-        colnames = remove_duplicates([x[:-2] if x[-2] in decades else x for x in strip])
-        colnames.insert(1, 'Year') # add 'Year" as second element
-        f2.write(delim.join(colnames) + '%s \n' % delim)
-
         # split into time-based columns and non-time based, don't include key
         preyears, nonyears = [x for x in strip[1:] if x[-2] in decades], \
                              [x for x in strip[1:] if x[-2] not in decades]
+
+        yearvars = remove_duplicates([x[:-2] for x in preyears])
+
+        #compute column names
+        colnames = list(chain.from_iterable([[strip[0]], yearvars, nonyears]))
+        colnames.insert(1, 'Year') # add 'Year" as second element
+        f2.write(delim.join(colnames) + '%s \n' % delim)
+
+        year_i = [strip.index(x) for x in preyears]
+        nonyear_i = [strip.index(x) for x in nonyears]
 
         allyears = ['19' + h[-2:] if h[-2] == '9' else '20' + h[-2:] for h in preyears] # convert to 'YYYY' format
         uyears = remove_duplicates(allyears)
@@ -64,18 +70,20 @@ def w2l(filepath, delim_type, linelimit):
         num_all_years = len(allyears) #number of total year-based columns
         numw2l = num_all_years/len(uyears) #number of vars to go from wide to long
 
-        for i, line in enumerate(f):
-            if i<= linelimit:
-                strip = line.strip().split(delim)
-                key, time, nontime = strip[0], strip[1:num_all_years+1], [strip[num_all_years+1:]]*num_all_years #separate key from the rest of the line
-                timesplit = splitlist(numw2l, time) #split into equal lists
-    
-                for year, timevals, nontimevals in zip(uyears, timesplit, nontime):
-                    if any(timevals): #if the long to wide values are not empty
-                        f2.write(delim.join([key, year, delim.join(timevals), delim.join(nontimevals)]) + '%s \n' % delim)
-                    else:
-                        continue
-            else: break
+        for _, line in zip(xrange(linelimit), f):
+            strip = line.strip().split(delim)
+            key, time, nontime = strip[0], [strip[i] for i in year_i], [[strip[i] for i in nonyear_i]]*num_all_years #separate key from the rest of the line
+            timesplit = splitlist(numw2l, time) #split into equal lists
+
+            for year, timevals, nontimevals in zip(uyears, timesplit, nontime):
+                if any(timevals): #if the long to wide values are not empty
+                    f2.write(delim.join([key, year, delim.join(timevals), delim.join(nontimevals)]) + '%s \n' % delim)
+                else:
+                    continue
+
 
 if __name__ == '__main__':
-    w2l(filename, 'tab', 10)
+    t0 = time.time()
+    w2l(filename, 'tab', 1*10*5)
+    t1 = time.time()
+    print(t1-t0)
