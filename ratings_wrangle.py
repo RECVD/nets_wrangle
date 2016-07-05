@@ -28,13 +28,15 @@ class Reader:
 
 
 class Manipulator:
-    def __init__(self, generator):
+    def __init__(self, generator, SIC=False):
         self.decades = ('0', '1', '9') #decade in YYYY date format
         self.generator = generator
 
-        self.line1 = self.format_line1(self.set_attributes())
-
-
+        self.line1_noformat = self.set_attributes()
+        self.line1 = self.format_line1(self.line1_noformat)
+        if SIC: # only for SIC files
+            self.time_indices = [self.line1_noformat.index(i) for i in self.line1_noformat if i[-2] in self.decades]
+            self.sic8_index = self.line1_noformat.index('SIC8')
     def splitlist(self, numsplits, l, ratings):
         """
         Split List into sub-lists of equal size whilst preserving order
@@ -62,6 +64,20 @@ class Manipulator:
         seen = set()
         seen_add = seen.add
         return [x for x in seq if not (x in seen or seen_add(x))]
+
+    def BEH(self, line):
+
+        list_sic = [line[i] for i in self.time_indices] # New variable with non-time removed from the list
+        list_sic = filter(None, list_sic)
+        common = max(set(list_sic), key=list_sic.count)  # Most common SIC
+        BEH_LargestPercent = round((float(list_sic.count(common)) / len(list_sic) * 100), 2)
+
+        if BEH_LargestPercent >= 75:
+            BEH_SIC = common
+        else:
+            BEH_SIC = list_sic[self.sic8_index]
+
+        return common, BEH_LargestPercent, BEH_SIC
 
     def format_line1(self, line1):
         """Read and format first line and return it.  You must pass the first line as an argument.
@@ -142,12 +158,17 @@ class Writer:
 if __name__ == '__main__':
     t0 = time.time()
     filepath = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
-    read = Reader(filepath, '\t', line_limit=10**6)
-    manip = Manipulator(read.line_gen)
+    read = Reader(filepath, '\t', line_limit=10**3)
+    manip = Manipulator(read.line_gen, SIC=True)
+    nextline = next(manip.generator)
+    print(nextline)
+    print(manip.BEH(nextline))
+    """
     a = manip.wide_to_long_all()
     write = Writer('out.txt', '\t', a)
     write.writeline(manip.line1)
     write.write_all()
     t1 = time.time()
     print t1-t0
+    """
 
