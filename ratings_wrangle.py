@@ -31,12 +31,14 @@ class Manipulator:
     def __init__(self, generator, SIC=False):
         self.decades = ('0', '1', '9') #decade in YYYY date format
         self.generator = generator
+        self.SIC = SIC
 
-        self.line1_noformat = self.set_attributes()
-        self.line1 = self.format_line1(self.line1_noformat)
-        if SIC: # only for SIC files
+        self.line1_noformat = self.set_attributes()  # Line 1 as read from the original file
+        self.line1 = self.format_line1(self.line1_noformat) #Line 1 post formatting (changing columns for w2l)
+        if self.SIC: # only for SIC files
             self.time_indices = [self.line1_noformat.index(i) for i in self.line1_noformat if i[-2] in self.decades]
             self.sic8_index = self.line1_noformat.index('SIC8')
+
     def splitlist(self, numsplits, l, ratings):
         """
         Split List into sub-lists of equal size whilst preserving order
@@ -66,7 +68,6 @@ class Manipulator:
         return [x for x in seq if not (x in seen or seen_add(x))]
 
     def BEH(self, line):
-
         list_sic = [line[i] for i in self.time_indices] # New variable with non-time removed from the list
         list_sic = filter(None, list_sic)
         common = max(set(list_sic), key=list_sic.count)  # Most common SIC
@@ -75,9 +76,9 @@ class Manipulator:
         if BEH_LargestPercent >= 75:
             BEH_SIC = common
         else:
-            BEH_SIC = list_sic[self.sic8_index]
+            BEH_SIC = line[self.sic8_index]
 
-        return common, BEH_LargestPercent, BEH_SIC
+        return [common, str(BEH_LargestPercent), BEH_SIC]
 
     def format_line1(self, line1):
         """Read and format first line and return it.  You must pass the first line as an argument.
@@ -91,6 +92,8 @@ class Manipulator:
     def set_attributes(self):
         """Set all attributes to be used in later manipulation functions"""
         line1 = next(self.generator) #get the first line from the generator
+        if self.SIC:
+            line1 = line1 + ['Common_SIC', 'BEH_LargestPercent', 'BEH_SIC']
 
         self.preyears, self.nonyears = [x for x in line1[1:] if x[-2] in self.decades], \
                              [x for x in line1[1:] if x[-2] not in self.decades]
@@ -112,6 +115,8 @@ class Manipulator:
         return line1
 
     def wide_to_long_single(self, line):
+        if self.SIC:  # Calculate and add the BEH attributes if this is a SIC file
+            line = line + self.BEH(line)
         try:
             key, time, nontime = line[0], [line[i] for i in self.year_indices], [
                 [line[i] for i in self.nonyear_indices]] * self.num_all_years  # separate key from the rest of the line
@@ -161,14 +166,11 @@ if __name__ == '__main__':
     read = Reader(filepath, '\t', line_limit=10**3)
     manip = Manipulator(read.line_gen, SIC=True)
     nextline = next(manip.generator)
-    print(nextline)
-    print(manip.BEH(nextline))
-    """
     a = manip.wide_to_long_all()
     write = Writer('out.txt', '\t', a)
     write.writeline(manip.line1)
     write.write_all()
     t1 = time.time()
     print t1-t0
-    """
+
 
