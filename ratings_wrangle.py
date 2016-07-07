@@ -1,4 +1,5 @@
 from itertools import chain
+from os import listdir, chdir
 import time
 
 class Reader:
@@ -28,6 +29,7 @@ class Reader:
 
 
 class Manipulator:
+
     def __init__(self, generator, SIC=False):
         self.decades = ('0', '1', '9') #decade in YYYY date format
         self.generator = generator
@@ -144,6 +146,51 @@ class Manipulator:
                     yield single_line
 
 
+class Classifier:
+    def __init__(self, config_dir, delim = ',', wide=True):
+        self.config_dir = config_dir
+        self.delim = delim
+        self.wide = wide
+        chdir(self.config_dir)
+
+        self.all_config = self.read_all_config()
+
+    def read_config(self, config_filename):
+        """ Read csv config file to dictionary. Returns a dictionary of lists.  The first item on each line will be
+        the key, and a list of all remaining items on each line will be the 'value'.
+
+        Keyword Arguments:
+        config_path:  The filepath to the text configuration file
+        """
+        dict = {}
+        with open(config_filename) as f:
+            for line in f:
+                line = line.strip().split(self.delim)
+                try:
+                    dict[line[0]] = line[1:] # separate the key (first item) from value (all others)
+                except IndexError:  # If there were no values after the line title
+                    dict[line[0]] = None
+        return dict
+
+    def read_all_config(self):
+        """ Performs read_config on all files in self.config_dir and adds items to a nested dictionary.  The 'key'
+        is the name of the config file (without extension) and the 'value' is the dictionary as returned by
+        'read_config'
+        """
+        nested_dir_dict = {}
+        for config in listdir(self.config_dir):
+            dir_dict =  self.read_config(config)
+            nested_dir_dict[config[:-4]] = dir_dict  # -4 removes the file extension
+        return nested_dir_dict
+
+    def classify(self, SIC, SIC_range, name):
+        for key1, value1 in self.all_config.iteritems():
+            for key2, value2 in value1.iteritems():
+                if key2.lower() == "sic_exclusive" and SIC in value2:
+                    
+
+
+
 class Writer:
     def __init__(self, filepath, delim_type, generator):
         self.filepath = filepath
@@ -159,8 +206,13 @@ class Writer:
         for line in self.generator:
             self.writeline(line)
 
-
 if __name__ == '__main__':
+    config_dir = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\classify_configs'
+    config_path = config_dir + r'\fast_food.txt'
+    classy = Classifier(config_dir)
+    classy_configs = classy.read_all_config()
+    print classy_configs['pizza']['name_terms']
+    """
     t0 = time.time()
     filepath = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
     read = Reader(filepath, '\t', line_limit=10**3)
@@ -172,5 +224,5 @@ if __name__ == '__main__':
     write.write_all()
     t1 = time.time()
     print t1-t0
-
+    """
 
