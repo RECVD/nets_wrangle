@@ -154,6 +154,7 @@ class Classifier:
         chdir(self.config_dir)
 
         self.all_config = self.read_all_config()
+        self.make_range()
 
     def read_config(self, config_filename):
         """ Read csv config file to dictionary. Returns a dictionary of lists.  The first item on each line will be
@@ -179,15 +180,34 @@ class Classifier:
         """
         nested_dir_dict = {}
         for config in listdir(self.config_dir):
-            dir_dict =  self.read_config(config)
+            dir_dict = self.read_config(config)
             nested_dir_dict[config[:-4]] = dir_dict  # -4 removes the file extension
         return nested_dir_dict
 
+    def make_range(self):
+        def to_zip(iterable):
+            iterable = [int(i) for i in iterable if i]  #convert the iterable to int if it isn't empty str
+            return zip(iterable[0::2], iterable[1::2])
+
+        for key, _ in self.all_config.iteritems():
+            self.all_config[key]['SIC_ranges'] = to_zip(self.all_config[key]['SIC_ranges'])
+
+    def is_class(self, SIC, config_key):
+        if SIC in self.all_config[config_key]['SIC_exclusive']:
+            return True
+        """
+        for item in self.all_config[config_key]['SIC_ranges']:
+            if SIC in range(item[0], item[1]+1):  # Unpack the tuple 'item' to use as parameters in 'range()'
+                return True
+        """
+        """
+        if name.lower() in [item.lower() for item in config_dict['name_terms']]:
+            return True
+        """
+        return False
+
     def classify(self, SIC, SIC_range, name):
-        for key1, value1 in self.all_config.iteritems():
-            for key2, value2 in value1.iteritems():
-                if key2.lower() == "sic_exclusive" and SIC in value2:
-                    
+        pass
 
 
 
@@ -210,8 +230,8 @@ if __name__ == '__main__':
     config_dir = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\classify_configs'
     config_path = config_dir + r'\fast_food.txt'
     classy = Classifier(config_dir)
-    classy_configs = classy.read_all_config()
-    print classy_configs['pizza']['name_terms']
+    print(classy.is_class(54999999, 'pizza'))
+
     """
     t0 = time.time()
     filepath = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
