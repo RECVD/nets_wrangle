@@ -164,11 +164,19 @@ class Classifier:
         config_path:  The filepath to the text configuration file
         """
         dict = {}
+
+        def list_to_int(ls):
+            try:
+                return [str(sic) for sic in ls if sic]
+            except ValueError:
+                return ls
+
         with open(config_filename) as f:
             for line in f:
                 line = line.strip().split(self.delim)
                 try:
-                    dict[line[0]] = line[1:] # separate the key (first item) from value (all others)
+                    dict[line[0]] = list_to_int(line[1:]) # separate the key (first item) from value (all others)
+
                 except IndexError:  # If there were no values after the line title
                     dict[line[0]] = None
         return dict
@@ -186,7 +194,7 @@ class Classifier:
 
     def make_range(self):
         def to_zip(iterable):
-            iterable = [int(i) for i in iterable if i]  #convert the iterable to int if it isn't empty str
+            #iterable = [int(i) for i in iterable if i]  #convert the iterable to int if it isn't empty str
             return zip(iterable[0::2], iterable[1::2])
 
         for key, _ in self.all_config.iteritems():
@@ -206,9 +214,13 @@ class Classifier:
         """
         return False
 
-    def classify(self, SIC, SIC_range, name):
-        pass
-
+    def classify(self, SIC):
+        for key, _ in self.all_config.iteritems():
+            if self.is_class(SIC, key):
+                return key
+            else:
+                continue
+        return 'not'
 
 
 class Writer:
@@ -230,7 +242,8 @@ if __name__ == '__main__':
     config_dir = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\classify_configs'
     config_path = config_dir + r'\fast_food.txt'
     classy = Classifier(config_dir)
-    print(classy.is_class(54999999, 'pizza'))
+    print(classy.all_config['pizza'])
+    print(classy.classify('58120600'))
 
     """
     t0 = time.time()
