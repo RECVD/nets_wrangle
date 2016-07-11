@@ -1,0 +1,193 @@
+{
+  "piz": {
+    "sic_exclusive": [
+      58120600,
+      58120601,
+      58120602
+    ],
+    "sic_ranges": [
+      54110000,
+      54999999,
+      58120000,
+      58129999
+    ],
+    "names": [
+      "pizza",
+      "pizzeria"
+    ]
+  },
+  "war": {
+    "sic_exclusive": [],
+    "sic_ranges": [],
+    "names": [
+      "SAMS CLUB",
+      "COSTCO WHOLESALE",
+      "PRICE CLUB",
+      "BJS WHOLESALE",
+      "BJS"
+    ]
+  },
+  "aff": {
+    "sic_exclusive": [
+      58120300,
+      58120307,
+      58120308
+    ],
+    "sic_ranges": [
+      58120000,
+      58129999
+    ],
+    "names": [
+      "ARBYS",
+      "BASKIN ROBBINS",
+      "BLIMPIE",
+      "BOJANGLES",
+      "BOSTON MARKET",
+      "BURGER KING",
+      "CHECKERS",
+      "CHIPOTLE",
+      "CHURCHS CHICKEN",
+      "DAIRY QUEEN",
+      "DOMINOS PIZZA",
+      "DUNKIN DONUTS",
+      "EL POLLO LOCO",
+      "FUDDRUCKERS",
+      "HARDEES",
+      "JAMBA JUICE",
+      "KENTUCKY FRIED CHICKEN",
+      "KFC",
+      "KRISPY KREME",
+      "LONG JOHN SILVERS",
+      "MCDONALDS",
+      "PANDA EXPRESS",
+      "PAPA JOHN",
+      "PIZZA HUT",
+      "POPEYES",
+      "QUIZNOS",
+      "ROUND TABLE",
+      "SBARRO",
+      "SONIC",
+      "STARBUCKS",
+      "SUBWAY",
+      "SUBWAY SANDWICHES",
+      "SUBWAY RESTAURANT",
+      "TACO BELL",
+      "TCBY",
+      "WENDYS",
+      "WENDYS OLD",
+      "WHITE CASTLE",
+      "BEN & JERRYS",
+      "BEN AND JERRYS",
+      "CARVEL ICE CREAM CAKES",
+      "COLD STONE CREAMERY",
+      "HAAGEN-DAZS",
+      "HAAGENDAZS",
+      "HAAGEN DAZS",
+      "I CANT BELIEVE ITS YOGURT",
+      "LITTLE CAESARS PIZZA",
+      "SCHLOTZSKYS DELI",
+      "AU BON PAIN",
+      "A B P CPATION",
+      "AUNTIE ANNES",
+      "CHICKEN HOLIDAY",
+      "COFFEE SHOP NTH CENTRAL HOSP",
+      "DIRECTS METRO FOOD SERVICE",
+      "COSI SANDWICH",
+      "CROWN FRIED CHICKEN",
+      "EVERYTHING YOGURT & SALAD",
+      "GRAYS PAPAYA",
+      "KENNEDY FRIED CHICKEN",
+      "KOSHER DELIGHT CP",
+      "MANHATTAN BAGEL",
+      "METROPOLITAN DELI",
+      "MIAMI SUBS & GRILL",
+      "MIAMI SUBS CPATION",
+      "NATHANS FAMOUS",
+      "PAPAYA KING",
+      "PUDGIES FAMOUS CHICKEN",
+      "ROY ROGERS",
+      "EL POLLO SUPREMO",
+      "SUPREME CHICKEN OF NEW JERSEY",
+      "TOGOS",
+      "XANDO",
+      "ZN FAMOUS CHICKEN & RIBS",
+      "ZNS FAMOUS CHICKEN"
+    ]
+  },
+  "eat": {
+    "sic_exclusive": [],
+    "sic_ranges": [
+      58120000,
+      58129999
+    ],
+    "names": []
+  },
+  "bak": {
+    "sic_exclusive": [
+      54419901,
+      54419902,
+      54419903,
+      54419905
+    ],
+    "sic_ranges": [
+      54610000,
+      54619999
+    ],
+    "names": []
+  },
+  "met": {
+    "sic_exclusive": [],
+    "sic_ranges": [
+      54210200,
+      54210299
+    ],
+    "names": []
+  },
+  "fvm": {
+    "sic_exclusive": [],
+    "sic_ranges": [
+      54310000,
+      54319999
+    ],
+    "names": []
+  },
+  "nat": {
+    "sic_exclusive": [
+      54419904
+    ],
+    "sic_ranges": [
+      54990100,
+      54990199,
+      54990900,
+      54990999,
+      54993500,
+      54993599
+    ],
+    "names": []
+  },
+  "fsh": {
+    "sic_exclusive": [],
+    "sic_ranges": [
+      54210100,
+      54210199
+    ],
+    "names": []
+  },
+  "cnv": {
+    "sic_exclusive": [],
+    "sic_ranges": [
+      54110200,
+      54110299
+    ],
+    "names": []
+  },
+  "bds": {
+    "sic_exclusive": [],
+    "sic_ranges": [
+      54110000,
+      54119999
+    ],
+    "names": [],
+    "emphere": "g5" 
+  }
+}
