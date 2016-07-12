@@ -1,6 +1,7 @@
 from itertools import chain
 from os import listdir, chdir
-import time
+import json
+from pprint import pprint
 
 class Reader:
     def __init__(self, filepath, delim_type, line_limit=0):
@@ -147,50 +148,19 @@ class Manipulator:
 
 
 class Classifier:
-    def __init__(self, config_dir, delim = ',', wide=True):
-        self.config_dir = config_dir
+    def __init__(self, config_file, delim = ',', wide=True):
+        self.config_file = config_file
         self.delim = delim
         self.wide = wide
         chdir(self.config_dir)
 
-        self.all_config = self.read_all_config()
+        self.all_config = self.read_config_json(self.config_file)
         self.make_range()
 
-    def read_config(self, config_filename):
-        """ Read csv config file to dictionary. Returns a dictionary of lists.  The first item on each line will be
-        the key, and a list of all remaining items on each line will be the 'value'.
-
-        Keyword Arguments:
-        config_path:  The filepath to the text configuration file
-        """
-        dict = {}
-
-        def list_to_int(ls):
-            try:
-                return [str(sic) for sic in ls if sic]
-            except ValueError:
-                return ls
-
+    def read_config_json(self, config_filename):
         with open(config_filename) as f:
-            for line in f:
-                line = line.strip().split(self.delim)
-                try:
-                    dict[line[0]] = list_to_int(line[1:]) # separate the key (first item) from value (all others)
-
-                except IndexError:  # If there were no values after the line title
-                    dict[line[0]] = None
-        return dict
-
-    def read_all_config(self):
-        """ Performs read_config on all files in self.config_dir and adds items to a nested dictionary.  The 'key'
-        is the name of the config file (without extension) and the 'value' is the dictionary as returned by
-        'read_config'
-        """
-        nested_dir_dict = {}
-        for config in listdir(self.config_dir):
-            dir_dict = self.read_config(config)
-            nested_dir_dict[config[:-4]] = dir_dict  # -4 removes the file extension
-        return nested_dir_dict
+            config_dict = json.load(f)
+        return config_dict
 
     def make_range(self):
         def to_zip(iterable):
@@ -239,11 +209,11 @@ class Writer:
             self.writeline(line)
 
 if __name__ == '__main__':
-    config_dir = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\classify_configs'
-    config_path = config_dir + r'\fast_food.txt'
-    classy = Classifier(config_dir)
-    print(classy.all_config['pizza'])
-    print(classy.classify('58120600'))
+    # config_dir = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\classify_configs'
+    # config_path = config_dir + r'\fast_food.txt'
+    json_config = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\json_config.json'
+    classy = Classifier(json_config)
+    pprint(classy.all_config)
 
     """
     t0 = time.time()
