@@ -269,13 +269,23 @@ class Classifier:
             else:
                 return False
 
-    def classify(self, **kwargs):
+    def classify(self, name, sic, emp, sales):
         for key, _ in self.all_config.iteritems():
-            if self.is_class(key, **kwargs):
+            if self.is_class(key, name, sic, emp, sales):
                 return key
             else:
                 continue
         return 'not'
+
+    def classify_all(self, class_atts_iterable):
+        for business in class_atts_iterable:
+            try:
+                name, sic, emp, sales = business
+            except ValueError:
+                print("Didn't provide all necessary variables for classification\n"
+                      "Variables Needed:\n"
+                      "name, sic, emp, sales")
+            yield self.classify(name, sic, emp, sales)
 
 
 class Writer:
@@ -298,7 +308,7 @@ if __name__ == '__main__':
     # config_path = config_dir + r'\fast_food.txt'
     json_config = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\json_config.json'
     classy = Classifier(json_config)
-    print(classy.is_class('aff','arbys', 58120000, 5, 3))
+    print(classy.classify('arbys', 58120000, 5, 3))
 
 
     """
