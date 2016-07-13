@@ -152,7 +152,6 @@ class Classifier:
         self.config_file = config_file
         self.delim = delim
         self.wide = wide
-        chdir(self.config_dir)
 
         self.all_config = self.read_config_json(self.config_file)
         self.make_range()
@@ -168,25 +167,111 @@ class Classifier:
             return zip(iterable[0::2], iterable[1::2])
 
         for key, _ in self.all_config.iteritems():
-            self.all_config[key]['SIC_ranges'] = to_zip(self.all_config[key]['SIC_ranges'])
+            try:
+                self.all_config[key]['sic_range'] = to_zip(self.all_config[key]['sic_range'])
+            except KeyError:
+                continue
 
-    def is_class(self, SIC, config_key):
-        if SIC in self.all_config[config_key]['SIC_exclusive']:
-            return True
-        """
-        for item in self.all_config[config_key]['SIC_ranges']:
-            if SIC in range(item[0], item[1]+1):  # Unpack the tuple 'item' to use as parameters in 'range()'
+    def is_class(self, config_key, name, sic, emp, sales):
+        local_config = self.all_config[config_key]
+        condit_code = local_config['conditional']
+
+        try:
+            name_bool = False
+            for config_name in local_config['name']:
+                name_bool = config_name.lower() in name.lower()
+                if name_bool:
+                    break
+        except KeyError:
+            pass
+
+        try:
+            sic_exclusive_bool = sic in local_config['sic_exclusive']
+        except KeyError:
+            pass
+
+        try:
+            sic_range_bool = False
+            for num_range in local_config['sic_range']:
+                if num_range[0] <= sic <= num_range[1]:
+                    sic_range_bool = True
+        except KeyError:
+            pass
+
+        try:
+            sic_range_2_bool = False
+            for num_range in local_config['sic_range_2']:
+                if num_range[0] <= sic <= num_range[1]:
+                    sic_range_2_bool = True
+        except KeyError:
+            pass
+
+        try:
+            if local_config['emp'][0] == 'g':
+                emp_bool = emp > int(local_config['emp'][1:])
+            else:
+                emp_bool = emp < int(local_config['emp'][1:])
+        except KeyError:
+            pass
+
+        try:
+            if local_config['sales'][0] == 'g':
+                sales_bool = sales > int(local_config['sales'][1:])
+            else:
+                sales_bool = sales < int(local_config['sales'][1:])
+        except KeyError:
+            pass
+
+        if condit_code == 1:
+            if name_bool:
                 return True
-        """
-        """
-        if name.lower() in [item.lower() for item in config_dict['name_terms']]:
-            return True
-        """
-        return False
+            else:
+                return False
 
-    def classify(self, SIC):
+        elif condit_code == 2:
+            if sic_exclusive_bool or (sic_range_bool and name_bool):
+                return True
+            else:
+                return False
+        elif condit_code == 3:
+            if sic_range_bool:
+                return True
+            else:
+                return False
+        elif condit_code == 4:
+            if sic_exclusive_bool and sic_range_bool:
+                return True
+            else:
+                return False
+        elif condit_code == 5:
+            if sic_range_bool and emp_bool:
+                return True
+            else:
+                return False
+        elif condit_code == 6:
+            if sic_range_bool and (sales_bool or emp_bool):
+                return True
+            else:
+                return False
+        elif condit_code == 7:
+            if sic_range_bool or (sic_range_2_bool and name_bool):
+                return True
+            else:
+                return False
+        elif condit_code == 8:
+            if sic_exclusive_bool:
+                return True
+            else:
+                return False
+        elif condit_code == 9:
+            if sic_exclusive_bool or name_bool:
+                return True
+            else:
+                return False
+
+    def classify(self, **kwargs):
         for key, _ in self.all_config.iteritems():
-            if self.is_class(SIC, key):
+            if self.is_class(key, **kwargs):
                 return key
             else:
                 continue
@@ -213,7 +298,8 @@ if __name__ == '__main__':
     # config_path = config_dir + r'\fast_food.txt'
     json_config = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\json_config.json'
     classy = Classifier(json_config)
-    pprint(classy.all_config)
+    print(classy.is_class('aff','arbys', 58120000, 5, 3))
+
 
     """
     t0 = time.time()
