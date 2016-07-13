@@ -156,12 +156,21 @@ class Classifier:
         self.all_config = self.read_config_json(self.config_file)
         self.make_range()
 
-    def read_config_json(self, config_filename):
-        with open(config_filename) as f:
+    def read_config_json(self, config_filepath):
+        """Reads JSON config file for classification into a dict and returns it
+        -----------
+        Keyword Arguments:
+        config_filepath: Full file path to the JSON config file
+        """
+        with open(config_filepath) as f:
             config_dict = json.load(f)
         return config_dict
 
     def make_range(self):
+        """SIC ranges in all_config are originally ranges in form such as [1,5,7,11]
+        make_range splits them up into a list of tuples, such as [(1,5),(7,11)] where each tuple indicates an inclusive
+        range.  Function to_zip(iterable) is nested, where iterable is a list with an even number of items.
+        """
         def to_zip(iterable):
             #iterable = [int(i) for i in iterable if i]  #convert the iterable to int if it isn't empty str
             return zip(iterable[0::2], iterable[1::2])
@@ -173,6 +182,16 @@ class Classifier:
                 continue
 
     def is_class(self, config_key, name, sic, emp, sales):
+        """
+        Returns True if the business described belongs to the class described in config_key, returns False otherwise.
+        -------
+        Keyword Arguments:
+        config_key: key that indicates what type of business is to be checked in self.all_config
+        name: name of the business to be classified
+        sic: SIC code of the business to be classified
+        emp: Number of employees of the business to be classified
+        sales:  Yearly sales yield of the business to be classified
+        """
         local_config = self.all_config[config_key]
         condit_code = local_config['conditional']
 
@@ -270,6 +289,14 @@ class Classifier:
                 return False
 
     def classify(self, name, sic, emp, sales):
+        """  Classify a business into a category defined in self.all_config.  If no category matches, return 'not'.
+        --------------
+        Keyword Arguments:
+        name: name of the business to be classified
+        sic: SIC code of the business to be classified
+        emp: Number of employees of the business to be classified
+        sales:  Yearly sales yield of the business to be classified
+        """
         for key, _ in self.all_config.iteritems():
             if self.is_class(key, name, sic, emp, sales):
                 return key
@@ -278,6 +305,12 @@ class Classifier:
         return 'not'
 
     def classify_all(self, class_atts_iterable):
+        """ Return a generator that classifies each of the business in class_atts_iterable
+        -----------
+        Keyword Arguments:
+        class_atts_iterable: Generator or nested list of business info necessary for classification.  Each list nested
+        in the iterable should contain: [name, sic, emp, sales]
+        """
         for business in class_atts_iterable:
             try:
                 name, sic, emp, sales = business
