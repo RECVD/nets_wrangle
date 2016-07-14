@@ -71,6 +71,15 @@ class Manipulator:
         return [x for x in seq if not (x in seen or seen_add(x))]
 
     def BEH(self, line):
+        """ Calculate BEH statistics.  BEH statistics include:
+        common:  most common SIC code across all years
+        BEH_LargestPercent:  highest percent of years that any single SIC code was used
+        BEH_SIC:  If BEH_LargestPercent >= 75, BEH_SIC = Common.  Otherwise, BEH_SIC = most recent SIC
+        ---------
+        Keyword Arguments:
+        line: Data line that would be found within the SIC NETS file
+
+        """
         list_sic = [line[i] for i in self.time_indices] # New variable with non-time removed from the list
         list_sic = filter(None, list_sic)
         common = max(set(list_sic), key=list_sic.count)  # Most common SIC
@@ -118,6 +127,13 @@ class Manipulator:
         return line1
 
     def wide_to_long_single(self, line):
+        """  Convert a single line from the wide to long format.  Time variables are inferred based on the class
+        attribute self.year_indices.  Returns a nested list of the lines created from the single argument "line".
+        -----------
+        Keyword Arguments:
+        line: The line of wide data to be transformed into the long format.
+
+        """
         if self.SIC:  # Calculate and add the BEH attributes if this is a SIC file
             line = line + self.BEH(line)
         try:
@@ -141,6 +157,10 @@ class Manipulator:
         return line_list
 
     def wide_to_long_all(self):
+        """
+        Perform self.wide_to_long() on all lines listed in self.generator, returns a new generator for the transformed
+        lines
+        """
         for line in self.generator:
                 line_list = self.wide_to_long_single(line)
                 for single_line in line_list:
@@ -148,10 +168,10 @@ class Manipulator:
 
 
 class Classifier:
-    def __init__(self, config_file, delim = ',', wide=True):
+    def __init__(self, config_file, delim = ','):
+        """Read JSON config file as global and reformat SIC ranges"""
         self.config_file = config_file
         self.delim = delim
-        self.wide = wide
 
         self.all_config = self.read_config_json(self.config_file)
         self.make_range()
