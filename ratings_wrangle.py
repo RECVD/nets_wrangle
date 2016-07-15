@@ -4,6 +4,7 @@ import json
 from pprint import pprint
 
 class Reader:
+    """"""
     def __init__(self, filepath, delim_type, line_limit=0):
         """Opens the file and sets the line_gen"""
         self.filepath = filepath
@@ -27,6 +28,7 @@ class Reader:
                 yield line.strip().split(self.delim_type)
 
     def __iter__(self):
+        """Allows you to iterate over self.line_gen using iter"""
         return self.line_gen
 
     def __del__(self):
@@ -349,18 +351,30 @@ class Classifier:
 
 class Writer:
     def __init__(self, filepath, delim_type, generator):
+        """Set object attributes and open the file for writing"""
         self.filepath = filepath
         self.delim_type = delim_type
         self.generator = generator
 
         self.f = open(self.filepath, 'w')
 
-    def writeline(self, data_list):
+    def write_line(self, data_list):
+        """Write a single line to the file self.f
+        -------
+        Keyword Arguments:
+        data_list: list of data to be converted to str and written
+        """
         self.f.write(self.delim_type.join(data_list) + '%s \n' % self.delim_type)
 
     def write_all(self ):
+        """Perform self.write on all lines in self.generator"""
         for line in self.generator:
-            self.writeline(line)
+            self.write_line(line)
+
+    def __del__(self):
+        """Close and delete the file self.f"""
+        self.f.close()
+        del(self.f)
 
 if __name__ == '__main__':
     # config_dir = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\classify_configs'
