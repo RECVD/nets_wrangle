@@ -15,7 +15,8 @@
       "pizza",
       "pizzeria"
     ],
-    "conditional": 2
+    "conditional": 2,
+    "ranking" : 3
   },
   "war": {
     "name": [
@@ -25,7 +26,8 @@
       "BJS WHOLESALE",
       "BJS"
     ],
-    "conditional": 1
+    "conditional": 1,
+    "ranking" : 2
   },
   "aff": {
     "sic_exclusive": [
@@ -113,7 +115,8 @@
       "ZN FAMOUS CHICKEN & RIBS",
       "ZNS FAMOUS CHICKEN"
     ],
-    "conditional": 2
+    "conditional": 2,
+    "ranking" : 1
   },
   "eat": {
     "sic_exclusive": [],
@@ -121,7 +124,8 @@
       58120000,
       58129999
     ],
-    "conditional": 3
+    "conditional": 3,
+    "ranking" : 7
   },
   "bak": {
     "sic_exclusive": [
@@ -134,21 +138,24 @@
       54610000,
       54619999
     ],
-    "conditional": 4
+    "conditional": 4,
+    "ranking" : 7
   },
   "met": {
     "sic_range": [
       54210200,
       54210299
     ],
-    "conditional": 4
+    "conditional": 4,
+    "ranking" : 7
   },
   "fvm": {
     "sic_range": [
       54310000,
       54319999
     ],
-    "conditional": 3
+    "conditional": 3,
+    "ranking" : 7
   },
   "nat": {
     "sic_exclusive": [
@@ -162,21 +169,24 @@
       54993500,
       54993599
     ],
-    "conditional": 4
+    "conditional": 4,
+    "ranking" : 7
   },
   "fsh": {
     "sic_range": [
       54210100,
       54210199
     ],
-    "conditional": 3
+    "conditional": 3,
+    "ranking" : 7
   },
   "cnv": {
     "sic_range": [
       54110200,
       54110299
     ],
-    "conditional": 3
+    "conditional": 3,
+    "ranking" : 4
   },
   "bds": {
     "sic_range": [
@@ -184,7 +194,8 @@
       54119999
     ],
     "emp": "g5",
-    "conditional": 5
+    "conditional": 5,
+    "ranking" : 5
   },
   "smk": {
     "sic_range": [
@@ -193,14 +204,16 @@
     ],
     "sales": "g2000000",
     "emp": "g18",
-    "conditional": 6
+    "conditional": 6,
+    "ranking" : 6
   },
   "gry": {
     "sic_range": [
       54110000,
       54119999
     ],
-    "conditional": 3
+    "conditional": 3,
+    "ranking" : 7
   },
   "bar": {
     "sic_exclusive": [
@@ -210,7 +223,8 @@
       58130000,
       58139999
     ],
-    "conditional": 4
+    "conditional": 4,
+    "ranking" : 11
   },
   "liq": {
     "sic_range": [
@@ -222,7 +236,8 @@
       51899999
     ],
     "name": "liquor",
-    "conditional": 7
+    "conditional": 7,
+    "ranking" : 11
   },
   "urg": {
     "sic_exclusive": [
@@ -244,7 +259,8 @@
       80620000,
       80629999
     ],
-    "conditional": 4
+    "conditional": 4,
+    "ranking" : 8
   },
   "hpc": {
     "sic_exclusive": [
@@ -280,7 +296,8 @@
       80110500,
       80119905
     ],
-    "conditional": 4
+    "conditional": 4,
+    "ranking" : 8
   },
   "res": {
     "sic_exclusive": [
@@ -306,7 +323,8 @@
       83610400,
       83610499
     ],
-    "conditional": 4
+    "conditional": 4,
+    "ranking" : 8
   },
   "drg": {
     "sic_exclusive": [
@@ -319,7 +337,8 @@
       59120000,
       59129902
     ],
-    "conditional": 4
+    "conditional": 4,
+    "ranking" : 8
   },
   "mhc": {
     "sic_exclusive": [
@@ -352,7 +371,8 @@
       83619903,
       83619905
     ],
-    "conditional": 8
+    "conditional": 8,
+    "ranking" : 8
   },
   "dds": {
     "sic_exclusive": [
@@ -373,7 +393,8 @@
       80219902,
       80490501
     ],
-    "conditional": 8
+    "conditional": 8,
+    "ranking" : 8
   },
   "mul": {
     "sic_exclusive": [
@@ -450,7 +471,8 @@
       "YOUNG WOMENS CHRISTIAN ASSOC",
       "YWCA"
     ],
-    "conditional": 9
+    "conditional": 9,
+    "ranking" : 9
   },
   "vpa": {
     "sic_exclusive": [
@@ -492,7 +514,8 @@
       79991412,
       82999914
     ],
-    "conditional": 8
+    "conditional": 8,
+    "ranking" : 10
   },
   "mpa": {
     "sic_exclusive": [
@@ -552,7 +575,8 @@
       79999903,
       82999903
     ],
-    "conditional": 8
+    "conditional": 8,
+    "ranking" : 10
   },
   "bnk": {
     "sic_exclusive": [
@@ -572,7 +596,8 @@
       60369901,
       60369902
     ],
-    "conditional": 8
+    "conditional": 8,
+    "ranking" : 12
   },
   "crd": {
     "sic_exclusive": [
@@ -581,7 +606,8 @@
       60629900,
       60629901
     ],
-    "conditional": 8
+    "conditional": 8,
+    "ranking" : 12
   },
   "des": {
     "sic_range": [
@@ -601,6 +627,7 @@
       84999999
     ],
     "emp": "l250",
-    "conditional": 5
+    "conditional": 5,
+    "ranking" : 13
   }
 }
