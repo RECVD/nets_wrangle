@@ -5,6 +5,7 @@ from pprint import pprint
 
 class Reader:
     def __init__(self, filepath, delim_type, line_limit=0):
+        """Opens the file and sets the line_gen"""
         self.filepath = filepath
         self.delim_type = delim_type
         self.line_limit = line_limit
@@ -25,8 +26,13 @@ class Reader:
             for line in self.f:
                 yield line.strip().split(self.delim_type)
 
-    def close_file(self):
+    def __iter__(self):
+        return self.line_gen
+
+    def __del__(self):
+        """Closes and deletes file self.f"""
         self.f.close()
+        del self.f
 
 
 class Manipulator:
