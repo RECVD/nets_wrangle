@@ -4,7 +4,8 @@ import json
 from pprint import pprint
 
 class Reader:
-    """"""
+    """Wrapper for file objects to open, strip, split and create a generator of all lines"""
+
     def __init__(self, filepath, delim_type, line_limit=0):
         """Opens the file and sets the line_gen"""
         self.filepath = filepath
@@ -38,8 +39,18 @@ class Reader:
 
 
 class Manipulator:
-
+    """Class to do manipulation on lines fed in from a generator.  Includes wide to long and calculating
+    BEH statistics, and more.  Specifically designed to work with class Reader
+    """
     def __init__(self, generator, SIC=False):
+        """ Set object attributes and read and format based on line 1.
+        ---------------
+        Keyword Arguments:
+        generator:  A generator of list data in wide format to be transferred to long.  Successful transformation
+        requires correct data formatting and column titles as the first thing created by the generator.
+        sic:  Boolean to indicate whether this is the SIC file, which needs special treatment
+
+        """
         self.decades = ('0', '1', '9') #decade in YYYY date format
         self.generator = generator
         self.SIC = SIC
