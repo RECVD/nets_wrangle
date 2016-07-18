@@ -3,34 +3,36 @@ from os import listdir, chdir
 import json
 from pprint import pprint
 
+
 class Reader:
-    """Wrapper for file objects to open, strip, split and create a generator of all lines"""
+    """Iterator protocol that yields lines from the file specified in filepath.  Creates an iterable object."""
 
     def __init__(self, filepath, delim_type, line_limit=0):
         """Opens the file and sets the line_gen"""
         self.filepath = filepath
         self.delim_type = delim_type
         self.line_limit = line_limit
+        self.current = 0
 
         self.f = self.open_file()
-        self.line_gen = self.read_all()  # create line generator
+        # self.line_gen = self.read_all()  # create line generator
 
     def open_file(self):
         """Opens the file specified in 'filepath'"""
         return open(self.filepath, 'r')
 
-    def read_all(self):
-        """Generator that will yield lines in the file"""
-        if self.line_limit:  # if we're not reading the whole file
-            for _, line in zip(xrange(self.line_limit), self.f):
-                yield line.strip().split(self.delim_type)
-        else:
-            for line in self.f:
-                yield line.strip().split(self.delim_type)
-
     def __iter__(self):
         """Allows you to iterate over self.line_gen using iter"""
-        return self.line_gen
+        return self
+
+    def next(self):
+        """Generator that will yield lines in the file"""
+        for line in self.f:
+            if self.current > self.line_limit:
+                raise StopIteration
+            else:
+                self.current += 1
+                return line.strip().split(self.delim_type)
 
     def __del__(self):
         """Closes and deletes file self.f"""
@@ -336,12 +338,20 @@ class Classifier:
         emp: Number of employees of the business to be classified
         sales:  Yearly sales yield of the business to be classified
         """
+        true_keys = []
         for key, _ in self.all_config.iteritems():
             if self.is_class(key, name, sic, emp, sales):
-                return key
+                true_keys.append(key)
             else:
                 continue
-        return 'not'
+
+        if not true_keys:
+            return 'not'
+        else:
+            rankdict = dict()
+            for key in true_keys:
+                rankdict[key] = self.all_config[key]['ranking']
+
 
     def classify_all(self, class_atts_iterable):
         """ Return a generator that classifies each of the business in class_atts_iterable
@@ -391,8 +401,24 @@ if __name__ == '__main__':
     # config_dir = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\classify_configs'
     # config_path = config_dir + r'\fast_food.txt'
     json_config = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\json_config.json'
+    sic = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
+    emp = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Emp.txt"
+    sales = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Sales.txt"
+    company = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Company.txt"
+
+    # Create Readers
+    read_sic = Reader(sic, '\t', line_limit=10)
+    read_emp = Reader(emp, '\t', line_limit=10)
+    read_sales = Reader(sales, '\t', line_limit=10)
+    read_company = Reader(company, '\t', line_limit=10)
+
+
     classy = Classifier(json_config)
     print(classy.classify('arbys', 58120000, 5, 3))
+
+
+
+
 
 
     """
