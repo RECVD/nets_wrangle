@@ -44,7 +44,7 @@ class Manipulator:
     """Class to do manipulation on lines fed in from a generator.  Includes wide to long and calculating
     BEH statistics, and more.  Specifically designed to work with class Reader
     """
-    def __init__(self, generator, SIC=False):
+    def __init__(self, generator, long=True, SIC=False):
         """ Set object attributes and read and format based on line 1.
         ---------------
         Keyword Arguments:
@@ -59,6 +59,7 @@ class Manipulator:
 
         self.line1_noformat = self.set_attributes()  # Line 1 as read from the original file
         self.line1 = self.format_line1(self.line1_noformat) #Line 1 post formatting (changing columns for w2l)
+
         if self.SIC: # only for SIC files
             self.time_indices = [self.line1_noformat.index(i) for i in self.line1_noformat if i[-2] in self.decades]
             self.sic8_index = self.line1_noformat.index('SIC8')
@@ -219,6 +220,7 @@ class Classifier:
         for key, _ in self.all_config.iteritems():
             try:
                 self.all_config[key]['sic_range'] = to_zip(self.all_config[key]['sic_range'])
+                self.all_config[key]['sic_range_2'] = to_zip(self.all_config[key]['sic_range_2'])
             except KeyError:
                 continue
 
@@ -246,27 +248,29 @@ class Classifier:
             pass
 
         try:
-            sic_exclusive_bool = sic in local_config['sic_exclusive']
+            sic_exclusive_bool = False
+            sic_exclusive_bool = str(sic) in local_config['sic_exclusive']
         except KeyError:
             pass
 
         try:
             sic_range_bool = False
             for num_range in local_config['sic_range']:
-                if num_range[0] <= sic <= num_range[1]:
+                if int(num_range[0]) <= sic <= int(num_range[1]):
                     sic_range_bool = True
         except KeyError:
             pass
 
         try:
             sic_range_2_bool = False
-            for num_range in local_config['sic_range_2']:
-                if num_range[0] <= sic <= num_range[1]:
+            for num_range_2 in local_config['sic_range_2']:
+                if int(num_range_2[0]) <= sic <= int(num_range_2[1]):
                     sic_range_2_bool = True
         except KeyError:
             pass
 
         try:
+            emp_bool = False
             if local_config['emp'][0] == 'g':
                 emp_bool = emp > int(local_config['emp'][1:])
             else:
@@ -275,6 +279,7 @@ class Classifier:
             pass
 
         try:
+            sales_bool = False
             if local_config['sales'][0] == 'g':
                 sales_bool = sales > int(local_config['sales'][1:])
             else:
@@ -287,7 +292,6 @@ class Classifier:
                 return True
             else:
                 return False
-
         elif condit_code == 2:
             if sic_exclusive_bool or (sic_range_bool and name_bool):
                 return True
@@ -348,9 +352,7 @@ class Classifier:
         if not true_keys:
             return 'not'
         else:
-            rankdict = dict()
-            for key in true_keys:
-                rankdict[key] = self.all_config[key]['ranking']
+            return true_keys
 
 
     def classify_all(self, class_atts_iterable):
@@ -407,14 +409,31 @@ if __name__ == '__main__':
     company = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Company.txt"
 
     # Create Readers
-    read_sic = Reader(sic, '\t', line_limit=10)
-    read_emp = Reader(emp, '\t', line_limit=10)
-    read_sales = Reader(sales, '\t', line_limit=10)
-    read_company = Reader(company, '\t', line_limit=10)
+    limit = 10**3
+    read_sic = Reader(sic, '\t', line_limit=limit)
+    read_emp = Reader(emp, '\t', line_limit=limit)
+    read_sales = Reader(sales, '\t', line_limit=limit)
+    read_company = Reader(company, '\t', line_limit=limit)
+    classifier = Classifier(json_config, delim='\t')
 
+    # Create manipulators
+    manip_sic = Manipulator(read_sic, SIC=True)
 
-    classy = Classifier(json_config)
-    print(classy.classify('arbys', 58120000, 5, 3))
+    manip_emp = Manipulator(read_emp, SIC=False)
+    emp_index = manip_emp.line1_noformat.index('EmpHere')
+
+    manip_sales = Manipulator(read_sales, SIC=False)
+    sales_index = manip_sales.line1_noformat.index('SalesHere')
+
+    company_index = next(read_company).index('Company')
+
+    for sic, emp, sales, company in zip(manip_sic.generator, manip_emp.generator, manip_sales.generator, read_company):
+        sic = sic + manip_sic.BEH(sic)
+        try:
+            classification = classifier.classify(company[company_index], int(sic[-1]), int(emp[emp_index]), int(sales[sales_index]))
+            print(classification)
+        except IndexError:
+            continue
 
 
 
