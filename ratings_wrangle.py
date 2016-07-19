@@ -64,6 +64,8 @@ class Manipulator:
             self.time_indices = [self.line1_noformat.index(i) for i in self.line1_noformat if i[-2] in self.decades]
             self.sic8_index = self.line1_noformat.index('SIC8')
 
+            self.line1_noformat += ['Common', 'BEH_LargestPercent', 'BEH_SIC', 'Overall_Class']
+
     def splitlist(self, numsplits, l, ratings):
         """
         Split List into sub-lists of equal size whilst preserving order
@@ -148,7 +150,7 @@ class Manipulator:
 
         return line1
 
-    def wide_to_long_single(self, line):
+    def wide_to_long_single(self, line, SIC=False):
         """  Convert a single line from the wide to long format.  Time variables are inferred based on the class
         attribute self.year_indices.  Returns a nested list of the lines created from the single argument "line".
         -----------
@@ -156,7 +158,7 @@ class Manipulator:
         line: The line of wide data to be transformed into the long format.
 
         """
-        if self.SIC:  # Calculate and add the BEH attributes if this is a SIC file
+        if SIC:  # Calculate and add the BEH attributes if this is a SIC file
             line = line + self.BEH(line)
         try:
             key, time, nontime = line[0], [line[i] for i in self.year_indices], [
@@ -373,13 +375,13 @@ class Classifier:
 
 
 class Writer:
-    def __init__(self, filepath, delim_type, generator):
+    def __init__(self, filepath, delim_type, generator=None):
         """Set object attributes and open the file for writing"""
         self.filepath = filepath
         self.delim_type = delim_type
         self.generator = generator
 
-        self.f = open(self.filepath, 'w')
+        self.f = open(self.filepath, 'w')  # Open the file for writing
 
     def write_line(self, data_list):
         """Write a single line to the file self.f
@@ -389,10 +391,13 @@ class Writer:
         """
         self.f.write(self.delim_type.join(data_list) + '%s \n' % self.delim_type)
 
-    def write_all(self ):
+    def write_all(self):
         """Perform self.write on all lines in self.generator"""
-        for line in self.generator:
-            self.write_line(line)
+        if self.generator:
+            for line in self.generator:
+                self.write_line(line)
+        else:
+            print('No generator present for this Writer instance.')
 
     def __del__(self):
         """Close and delete the file self.f"""
@@ -400,23 +405,28 @@ class Writer:
         del(self.f)
 
 if __name__ == '__main__':
-    # config_dir = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\classify_configs'
-    # config_path = config_dir + r'\fast_food.txt'
+    # Read and config paths
     json_config = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\json_config.json'
     sic = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
     emp = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Emp.txt"
     sales = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Sales.txt"
     company = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Company.txt"
+    delim = '\t'
+
+    #  Write Paths
+    sic_out = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\SIC_transformed.txt"
+    emp_out = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\Emp_transformed.txt"
+    sales_out = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\Sales_transformed.txt"
 
     # Create Readers
     limit = 10**3
-    read_sic = Reader(sic, '\t', line_limit=limit)
-    read_emp = Reader(emp, '\t', line_limit=limit)
-    read_sales = Reader(sales, '\t', line_limit=limit)
-    read_company = Reader(company, '\t', line_limit=limit)
-    classifier = Classifier(json_config, delim='\t')
+    read_sic = Reader(sic, delim, line_limit=limit)
+    read_emp = Reader(emp, delim, line_limit=limit)
+    read_sales = Reader(sales, delim, line_limit=limit)
+    read_company = Reader(company, delim, line_limit=limit)
+    classifier = Classifier(json_config, delim=delim)
 
-    # Create manipulators
+    # Create manipulators and define indices of interest for classification
     manip_sic = Manipulator(read_sic, SIC=True)
 
     manip_emp = Manipulator(read_emp, SIC=False)
@@ -427,13 +437,21 @@ if __name__ == '__main__':
 
     company_index = next(read_company).index('Company')
 
+    # Create writers
+    write_sic = Writer(sic_out, delim_type=delim)
+    write_sales = Writer(sales_out, delim_type=delim)
+    write_emp = Writer(emp_out, delim_type=delim)
+
+    # Write the first line
+    manip_sic.line1
+
     for sic, emp, sales, company in zip(manip_sic.generator, manip_emp.generator, manip_sales.generator, read_company):
         sic = sic + manip_sic.BEH(sic)
         try:
             classification = classifier.classify(company[company_index], int(sic[-1]), int(emp[emp_index]), int(sales[sales_index]))
             print(classification)
         except IndexError:
-            continue
+            classification = 'error'
 
 
 
