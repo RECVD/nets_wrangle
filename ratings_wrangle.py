@@ -2,7 +2,7 @@ from itertools import chain
 from os import listdir, chdir
 import json
 from pprint import pprint
-
+import time
 
 class Reader:
     """Iterator protocol that yields lines from the file specified in filepath.  Creates an iterable object."""
@@ -63,8 +63,6 @@ class Manipulator:
         if self.SIC: # only for SIC files
             self.time_indices = [self.line1_noformat.index(i) for i in self.line1_noformat if i[-2] in self.decades]
             self.sic8_index = self.line1_noformat.index('SIC8')
-
-            self.line1_noformat += ['Common', 'BEH_LargestPercent', 'BEH_SIC', 'Overall_Class']
 
     def splitlist(self, numsplits, l, ratings):
         """
@@ -129,7 +127,7 @@ class Manipulator:
         """Set all attributes to be used in later manipulation functions"""
         line1 = next(self.generator) #get the first line from the generator
         if self.SIC:
-            line1 = line1 + ['Common_SIC', 'BEH_LargestPercent', 'BEH_SIC']
+            line1 = line1 + ['Common_SIC', 'BEH_LargestPercent', 'BEH_SIC', 'Overall_Class', 'Class_Here']
 
         self.preyears, self.nonyears = [x for x in line1[1:] if x[-2] in self.decades], \
                              [x for x in line1[1:] if x[-2] not in self.decades]
@@ -164,7 +162,7 @@ class Manipulator:
             key, time, nontime = line[0], [line[i] for i in self.year_indices], [
                 [line[i] for i in self.nonyear_indices]] * self.num_all_years  # separate key from the rest of the line
         except IndexError:  # caused by a line having only a key or not enough values, pad it with empty vals
-            padding = ["" for i in range(len(self.line1) - len(line))]
+            padding = ["" for i in range(len(self.line1_noformat) - len(line))]
             padded = line + padding
             key, time, nontime = padded[0], [padded[i] for i in self.year_indices], [
                 [padded[i] for i in self.nonyear_indices]] * self.num_all_years
@@ -239,6 +237,19 @@ class Classifier:
         """
         local_config = self.all_config[config_key]
         condit_code = local_config['conditional']
+
+        try:
+            sic = int(sic)
+        except ValueError:
+            sic = None
+        try:
+            emp = int(emp)
+        except ValueError:
+            emp = None
+        try:
+            sales = int(sales)
+        except ValueError:
+            sales = None
 
         try:
             name_bool = False
@@ -354,7 +365,7 @@ class Classifier:
         if not true_keys:
             return 'not'
         else:
-            return true_keys
+            return ' ; '.join(true_keys)
 
 
     def classify_all(self, class_atts_iterable):
@@ -405,8 +416,9 @@ class Writer:
         del(self.f)
 
 if __name__ == '__main__':
+    t0 = time.time()
     # Read and config paths
-    json_config = 'C:\Users\jc4673\Documents\Columbia\Python_r01_Wrangle\json_config.json'
+    json_config = r'C:\Users\jc4673\Documents\Columbia\nets_wrangle\json_config.json'
     sic = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
     emp = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Emp.txt"
     sales = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Sales.txt"
@@ -419,7 +431,7 @@ if __name__ == '__main__':
     sales_out = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\Sales_transformed.txt"
 
     # Create Readers
-    limit = 10**3
+    limit = 10**5
     read_sic = Reader(sic, delim, line_limit=limit)
     read_emp = Reader(emp, delim, line_limit=limit)
     read_sales = Reader(sales, delim, line_limit=limit)
@@ -443,32 +455,44 @@ if __name__ == '__main__':
     write_emp = Writer(emp_out, delim_type=delim)
 
     # Write the first line
-    manip_sic.line1
+    write_sic.write_line(manip_sic.line1)
+    write_sales.write_line(manip_sales.line1)
+    write_emp.write_line(manip_emp.line1)
 
-    for sic, emp, sales, company in zip(manip_sic.generator, manip_emp.generator, manip_sales.generator, read_company):
-        sic = sic + manip_sic.BEH(sic)
+    sic_here_index = manip_sic.line1.index('SIC')
+    emp_here_index = manip_emp.line1.index('Emp')
+    sales_here_index = manip_sales.line1.index('Sales')
+
+    for count, (sic, emp, sales, company) in enumerate(zip(manip_sic.generator, manip_emp.generator, manip_sales.generator, read_company)):
+        if count%(limit/10) == 0: # print dots to show progress
+            print(' . '),
+
+        sic += manip_sic.BEH(sic)
         try:
-            classification = classifier.classify(company[company_index], int(sic[-1]), int(emp[emp_index]), int(sales[sales_index]))
-            print(classification)
+            classification = classifier.classify(company[company_index], sic[-1], emp[emp_index], sales[sales_index])
         except IndexError:
             classification = 'error'
 
+        sic.append(classification)
+        long_sic = manip_sic.wide_to_long_single(sic + ['Filler'])  #add extra empty at the end as filler for ClassHere
+        long_emp = manip_emp.wide_to_long_single(emp)
+        long_sales = manip_sales.wide_to_long_single(sales)
 
+        for sic_long, emp_long, sales_long in zip(long_sic, long_emp, long_sales):
+            sic_long[-1] = (classifier.classify(company[company_index], sic_long[sic_here_index],
+                                                emp_long[emp_here_index], sales[sales_here_index]))
 
+            write_sic.write_line(sic_long)
+            write_emp.write_line(emp_long)
+            write_sales.write_line(sales_long)
 
+    del(read_company)
+    del(read_emp)
+    del(read_sales)
+    del(read_sic)
+    del(write_sic)
+    del(write_emp)
+    del(write_sales)
 
-
-    """
-    t0 = time.time()
-    filepath = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
-    read = Reader(filepath, '\t', line_limit=10**3)
-    manip = Manipulator(read.line_gen, SIC=True)
-    nextline = next(manip.generator)
-    a = manip.wide_to_long_all()
-    write = Writer('out.txt', '\t', a)
-    write.writeline(manip.line1)
-    write.write_all()
     t1 = time.time()
-    print t1-t0
-    """
-
+    print(t1-t0)
