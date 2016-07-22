@@ -1,0 +1,89 @@
+{
+  "piz": {
+    "ranking": 3
+  },
+  "war": {
+    "ranking": 2
+  },
+  "aff": {
+    "ranking": 1
+  },
+  "eat": {
+    "ranking": 7
+  },
+  "bak": {
+    "ranking": 7
+  },
+  "met": {
+    "ranking": 7
+  },
+  "fvm": {
+    "ranking": 7
+  },
+  "nat": {
+    "ranking": 7
+  },
+  "fsh": {
+    "ranking": 7
+  },
+  "cnv": {
+    "ranking": 4
+  },
+  "bds": {
+    "ranking": 5
+  },
+  "smk": {
+    "ranking": 6
+  },
+  "gry": {
+    "ranking": 7
+  },
+  "bar": {
+    "ranking": 11
+  },
+  "liq": {
+    "ranking": 11
+  },
+  "urg": {
+    "ranking": 8
+  },
+  "hpc": {
+    "ranking": 8
+  },
+  "res": {
+    "ranking": 8
+  },
+  "drg": {
+    "ranking": 8
+  },
+  "mhc": {
+    "ranking": 8
+  },
+  "dds": {
+    "ranking": 8
+  },
+  "mul": {
+    "ranking": 9
+  },
+  "vpa": {
+    "ranking": 10
+  },
+  "mpa": {
+    "ranking": 10
+  },
+  "bnk": {
+    "ranking": 12
+  },
+  "crd": {
+    "ranking": 12
+  },
+  "des": {
+    "ranking": 13
+  },
+  "not": {
+    "ranking": 50
+  },
+  "error": {
+    "ranking": 50
+  }  	    
+}
