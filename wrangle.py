@@ -7,7 +7,7 @@ import time
 class Reader:
     """Iterator protocol that yields lines from the file specified in filepath.  Creates an iterable object."""
 
-    def __init__(self, filepath, delim_type, line_limit=0):
+    def __init__(self, filepath, delim_type, line_limit=None):
         """Opens the file and sets the line_gen"""
         self.filepath = filepath
         self.delim_type = delim_type
@@ -15,7 +15,6 @@ class Reader:
         self.current = 0
 
         self.f = self.open_file()
-        # self.line_gen = self.read_all()  # create line generator
 
     def open_file(self):
         """Opens the file specified in 'filepath'"""
@@ -27,12 +26,20 @@ class Reader:
 
     def next(self):
         """Generator that will yield lines in the file"""
-        for line in self.f:
-            if self.current > self.line_limit:
-                raise StopIteration
-            else:
-                self.current += 1
-                return line.strip().split(self.delim_type)
+        if self.line_limit:
+            for line in self.f:
+                if self.current > self.line_limit:
+                    raise StopIteration
+                else:
+                    self.current += 1
+                    return line.strip().split(self.delim_type)
+        else:
+            for line in self.f:
+                line = line.strip().split(self.delim_type)
+                if line is not None:
+                    return line
+                else:
+                    raise StopIteration
 
     def __del__(self):
         """Closes and deletes file self.f"""
@@ -432,10 +439,10 @@ if __name__ == '__main__':
 
     # Create Readers
     limit = 10**5
-    read_sic = Reader(sic, delim, line_limit=limit)
-    read_emp = Reader(emp, delim, line_limit=limit)
-    read_sales = Reader(sales, delim, line_limit=limit)
-    read_company = Reader(company, delim, line_limit=limit)
+    read_sic = Reader(sic, delim, line_limit=None)
+    read_emp = Reader(emp, delim, line_limit=None)
+    read_sales = Reader(sales, delim, line_limit=None)
+    read_company = Reader(company, delim, line_limit=None)
     classifier = Classifier(json_config, delim=delim)
 
     # Create manipulators and define indices of interest for classification
