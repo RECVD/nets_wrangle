@@ -1,4 +1,4 @@
-from itertools import chain
+from itertools import chain, izip
 from os import listdir, chdir
 import json
 from pprint import pprint
@@ -438,11 +438,11 @@ if __name__ == '__main__':
     sales_out = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\Sales_transformed.txt"
 
     # Create Readers
-    limit = 10**5
-    read_sic = Reader(sic, delim, line_limit=None)
-    read_emp = Reader(emp, delim, line_limit=None)
-    read_sales = Reader(sales, delim, line_limit=None)
-    read_company = Reader(company, delim, line_limit=None)
+    limit = 10**3
+    read_sic = Reader(sic, delim, line_limit=limit)
+    read_emp = Reader(emp, delim, line_limit=limit)
+    read_sales = Reader(sales, delim, line_limit=limit)
+    read_company = Reader(company, delim, line_limit=limit)
     classifier = Classifier(json_config, delim=delim)
 
     # Create manipulators and define indices of interest for classification
@@ -470,9 +470,7 @@ if __name__ == '__main__':
     emp_here_index = manip_emp.line1.index('Emp')
     sales_here_index = manip_sales.line1.index('Sales')
 
-    for count, (sic, emp, sales, company) in enumerate(zip(manip_sic.generator, manip_emp.generator, manip_sales.generator, read_company)):
-        if count%(limit/10) == 0: # print dots to show progress
-            print(' . '),
+    for sic, emp, sales, company in izip(manip_sic.generator, manip_emp.generator, manip_sales.generator, read_company):
 
         sic += manip_sic.BEH(sic)
         try:
