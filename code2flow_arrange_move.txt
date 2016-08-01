@@ -1,0 +1,28 @@
+Open all files;
+Move file.readline() = this_move;
+while(Lines left){
+  before_check: Company file.readline()
+  Address first file.readline()
+  Misc file.readline();
+
+  
+  nop
+  if(!All DunsNumber Equal (This Duns 
+  Has Moved)){
+    write duns
+    write company.most_recent
+    write address_first.first;
+    goto before_check
+  }
+  write_duns: write duns
+  write move.origin
+  write move.destination;
+  move file.readline();
+  
+  while(move file.readline() == this_move){
+    goto write_duns;
+    
+    }
+}
+
+end process
