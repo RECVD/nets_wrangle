@@ -66,6 +66,7 @@ class Manipulator:
         self.long = long
 
         self.line1_noformat = self.set_attributes()  # Line 1 as read from the original file
+        self.column_dict = self.make_column_dict(self.line1_noformat)
 
         if self.long: # if converting from wide to long
             self.line1 = self.format_line1(self.line1_noformat) #Line 1 post formatting (changing columns for w2l)
@@ -158,6 +159,18 @@ class Manipulator:
             self.numw2l = self.num_all_years / len(self.unique_years)  # number of vars to go from wide to long
 
         return line1
+
+    def make_column_dict(self, column_list):
+        """Creates a dictionary of column names as keys and their indices as values and returns it
+        ----------
+        Keyword Arguments:
+        column_list:  List of column names to be turned into dict
+        """
+        column_dict = dict()
+        for item, index in enumerate(column_list):
+            column_dict[item] = index
+
+        return column_dict
 
     def wide_to_long_single(self, line, SIC=False):
         """  Convert a single line from the wide to long format.  Time variables are inferred based on the class
