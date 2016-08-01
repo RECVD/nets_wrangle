@@ -63,9 +63,12 @@ class Manipulator:
         self.decades = ('0', '1', '9') #decade in YYYY date format
         self.generator = generator
         self.SIC = SIC
+        self.long = long
 
         self.line1_noformat = self.set_attributes()  # Line 1 as read from the original file
-        self.line1 = self.format_line1(self.line1_noformat) #Line 1 post formatting (changing columns for w2l)
+
+        if self.long: # if converting from wide to long
+            self.line1 = self.format_line1(self.line1_noformat) #Line 1 post formatting (changing columns for w2l)
 
         if self.SIC: # only for SIC files
             self.time_indices = [self.line1_noformat.index(i) for i in self.line1_noformat if i[-2] in self.decades]
@@ -133,25 +136,26 @@ class Manipulator:
     def set_attributes(self):
         """Set all attributes to be used in later manipulation functions"""
         line1 = next(self.generator) #get the first line from the generator
-        if self.SIC:
-            line1 = line1 + ['Common_SIC', 'BEH_LargestPercent', 'BEH_SIC', 'Overall_Class', 'Class_Here']
+        if self.long:
+            if self.SIC:
+                line1 = line1 + ['Common_SIC', 'BEH_LargestPercent', 'BEH_SIC', 'Overall_Class', 'Class_Here']
 
-        self.preyears, self.nonyears = [x for x in line1[1:] if x[-2] in self.decades], \
-                             [x for x in line1[1:] if x[-2] not in self.decades]
-        self.yearvars = self.remove_duplicates([x[:-2] for x in self.preyears])
-        self.year_indices = [line1.index(x) for x in self.preyears]
-        self.nonyear_indices = [line1.index(x) for x in self.nonyears]
-        allyears = ['19' + h[-2:] if h[-2] == '9' else '20' + h[-2:] for h in self.preyears]  # convert to 'YYYY' format
-        self.unique_years = self.remove_duplicates(allyears)
+            self.preyears, self.nonyears = [x for x in line1[1:] if x[-2] in self.decades], \
+                                 [x for x in line1[1:] if x[-2] not in self.decades]
+            self.yearvars = self.remove_duplicates([x[:-2] for x in self.preyears])
+            self.year_indices = [line1.index(x) for x in self.preyears]
+            self.nonyear_indices = [line1.index(x) for x in self.nonyears]
+            allyears = ['19' + h[-2:] if h[-2] == '9' else '20' + h[-2:] for h in self.preyears]  # convert to 'YYYY' format
+            self.unique_years = self.remove_duplicates(allyears)
 
-        # Do we need to deal with the funky formatting in the ratings table?
-        if len(allyears) > 24 and allyears[0] != allyears[1]:
-            self.ratings = True
-        else:
-            self.ratings = False
+            # Do we need to deal with the funky formatting in the ratings table?
+            if len(allyears) > 24 and allyears[0] != allyears[1]:
+                self.ratings = True
+            else:
+                self.ratings = False
 
-        self.num_all_years = len(allyears)  # number of total year-based columns
-        self.numw2l = self.num_all_years / len(self.unique_years)  # number of vars to go from wide to long
+            self.num_all_years = len(allyears)  # number of total year-based columns
+            self.numw2l = self.num_all_years / len(self.unique_years)  # number of vars to go from wide to long
 
         return line1
 
@@ -438,7 +442,7 @@ if __name__ == '__main__':
     sales_out = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\Sales_transformed.txt"
 
     # Create Readers
-    limit = 10**3
+    limit = 10**1
     read_sic = Reader(sic, delim, line_limit=limit)
     read_emp = Reader(emp, delim, line_limit=limit)
     read_sales = Reader(sales, delim, line_limit=limit)
