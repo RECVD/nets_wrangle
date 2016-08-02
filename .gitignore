@@ -1,7 +1,7 @@
 *.xml
 *.csv
 *.pyc
-all_columns.txt
+/all_columns
 move_columns.txt
 move_summary_columns.txt
 /.idea
