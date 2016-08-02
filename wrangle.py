@@ -167,7 +167,7 @@ class Manipulator:
         column_list:  List of column names to be turned into dict
         """
         column_dict = dict()
-        for item, index in enumerate(column_list):
+        for index, item, in enumerate(column_list):
             column_dict[item] = index
 
         return column_dict
