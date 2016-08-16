@@ -1,7 +1,9 @@
 *.xml
 *.csv
 *.pyc
+*.prof
 /all_columns
 move_columns.txt
+NETS2013_LocationsSample.txt
 move_summary_columns.txt
 /.idea
