@@ -1,25 +1,26 @@
 import pandas as pd
-from time import time
 import itertools as it
 
-first = True
-# filenames for all df to be used
+first = True #boolean for first iteration, sets whether writing to new fileor appending
+# filenames for all df to be used - later to be replaced by GUI selection
 company_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Company.txt"
 address_first_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_AddressFirst.txt"
 misc_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Misc.txt"
 move_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\Move_sorted.txt"
 
+#read all data frame as generators, chunksize may need to be decreased for low-memory machines
 company_df = pd.read_table(company_filename, index_col=['DunsNumber'],
                            usecols=['DunsNumber','Company', 'Address', 'City', 'State', 'ZipCode'],
-                           chunksize=10**1)
+                           chunksize=10**6)
 address_first_df = pd.read_table(address_first_filename, index_col=['DunsNumber'],
                                  usecols=['DunsNumber', 'Address_First', 'City_First', 'CityCode_First',
                                           'State_First', 'ZipCode_First', 'FipsCounty_First'],
-                                 chunksize=10**1)
+                                 chunksize=10**6)
 misc_df = pd.read_table(misc_filename, index_col=['DunsNumber'],
                         usecols=['DunsNumber','FirstYear', 'LastYear', 'Latitude', 'Longitude', 'LevelCode',
-                                 'CityCode', 'FipsCounty'], chunksize=10**1)
+                                 'CityCode', 'FipsCounty'], chunksize=10**6)
 
+#smaller table with mismatched indices so the whole thing gets loaded into memory
 move_df = pd.read_table(move_filename, index_col=['DunsNumber', 'MoveYear'],
                         usecols=['DunsNumber', 'MoveYear', 
                                  'OriginAddress', 'OriginCity', 'OriginState', 'OriginZIP', 'OriginFIPSCounty',
@@ -28,26 +29,32 @@ move_df = pd.read_table(move_filename, index_col=['DunsNumber', 'MoveYear'],
 
 for company_chunk, add_first_chunk, misc_chunk in it.izip(company_df, address_first_df, misc_df):
 
+    # Join company with necessary piecees from misc
     company_chunk = company_chunk.join(misc_chunk[['LastYear', 'Latitude', 'Longitude', 'LevelCode', 'FipsCounty']])
-    company_chunk.rename(columns={'Address': 'PrimAdd',
+    company_chunk.rename(columns={'Address': 'PrimAdd', #rename columns to fit prim/sec scheme
                                   'LastYear': 'FirstYear',
                                   'City': 'PrimCity',
                                   'State': 'PrimState',
                                   'ZipCode': 'PrimZip',
                                   'FipsCounty': 'PrimFipsCounty'}, inplace=True)
+    company_chunk.set_index('FirstYear', append=True, inplace=True) #Use FirstYear to create MultiIndex for joining
 
+    # Join address first with FirstYear and form Multiindex
     add_first_chunk = add_first_chunk.join(misc_chunk['FirstYear'])
     add_first_chunk = add_first_chunk.set_index('FirstYear', append=True)
-    add_first_chunk.rename(columns={'Address_First':'SecAdd',
+    add_first_chunk.rename(columns={'Address_First':'SecAdd', #rename columns to fit prim/sec scheme
                                     'City_First': 'SecCity',
                                     'State_First': 'SecState',
                                     'ZipCode_First': 'SecZip',
                                     'FipsCounty_First' :'SecFipsCounty'}, inplace=True)
 
-    company_first = company_chunk.index[0]
-    company_last = company_chunk.index[-1]
+    #get move_chunk based on the last item in company_chunk
+    company_first = company_chunk.index.get_level_values('DunsNumber')[0]
+    company_last = company_chunk.index.get_level_values('DunsNumber')[-1]
     move_chunk = move_df.loc[company_first:company_last, :]
     move_chunk.index.names = ['DunsNumber', 'FirstYear']
+
+    #rename move_chunk columns to fit prim/sec scheme
     move_chunk.rename(columns={'OriginAddress':'PrimAdd', 'DestAddress':'SecAdd',
                                'OriginCity': 'PrimCity', 'DestCity': 'SecCity',
                                'OriginState': 'PrimState', 'DestState': 'SecState',
@@ -55,33 +62,36 @@ for company_chunk, add_first_chunk, misc_chunk in it.izip(company_df, address_fi
                                'OriginLatitude': 'Latitude', 'OriginLongitude': 'Longitude', 'OriginLevelCode': 'LevelCode',
                                'OriginFIPSCounty': 'PrimFipsCounty', 'DestFIPSCounty': 'SecFipsCounty'}, inplace=True)
 
+    #Create the secondary address df with pieces of both move and add-first
     sec_add = pd.concat([move_chunk[['SecAdd', 'SecCity', 'SecState', 'SecZip', 'SecFipsCounty']], add_first_chunk]).sort_index()
-
-    company_chunk.set_index('FirstYear', append=True, inplace=True)
-
+    #Primary address df with pieces of move and company
     primadd = pd.concat([move_chunk[['PrimAdd', 'PrimCity', 'PrimState', 'PrimZip', 'PrimFipsCounty', 'Latitude', 'Longitude',
                                      'LevelCode']], company_chunk]).sort_index()
 
-    prim_add = primadd.reset_index(drop=False) #was True
-
+    #drop primary_address index and set it as a copy of sec_add index, then join
+    prim_add = primadd.reset_index(drop=False)
     prim_add.index = sec_add.index.copy()
-
     joined = prim_add.join(sec_add, how='outer')
-    joined['Company'].bfill(inplace=True)
+    joined['Company'].bfill(inplace=True) #fill in missing doubles of company names
 
-    del joined['DunsNumber']
-
+    #leftover formatting
+    del joined['DunsNumber'] #leftover extra
     joined.rename(columns={'FirstYear':'LastYear'}, inplace=True)
 
-    column_order = ['LastYear', 'Company', 'PrimAdd', 'PrimCity', 'PrimFipsCounty', 'PrimState', 'PrimZip',
-                    'SecAdd', 'SecCity', 'SecFipsCounty', 'SecState', 'SecZip', 'Latitude', 'Longitude', 'LevelCode']
+    #create and add BEH_LOC and BEH_ID
+    joined['BEH_LOC'] = joined.groupby(level=0).cumcount() + 1
+    joined['BEH_ID'] = joined['BEH_LOC'] * (10 ** 9) + 10 ** 10 + joined.index.get_level_values(level=0)
 
+    # reorder columns for readability
+    column_order = ['LastYear', 'BEH_LOC', 'BEH_ID', 'Company', 'PrimAdd', 'PrimCity', 'PrimFipsCounty', 'PrimState',
+                    'PrimZip', 'SecAdd', 'SecCity', 'SecFipsCounty', 'SecState', 'SecZip', 'Latitude', 'Longitude',
+                    'LevelCode']
     joined = joined[column_order]
 
+    #write to new txt if first, append to current if not first
     if first:
         joined.to_csv('NETS2013_LocationsSample.txt', sep='\t')
         first = False
     else:
         joined.to_csv('NETS2013_LocationsSample.txt', sep='\t', mode='a', header=False)
 
-    print('wrote it\n')
