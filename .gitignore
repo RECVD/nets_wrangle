@@ -5,5 +5,7 @@
 /all_columns
 move_columns.txt
 NETS2013_LocationsSample.txt
+.ipynb_checkpoints
+/column_summary
 move_summary_columns.txt
 /.idea
