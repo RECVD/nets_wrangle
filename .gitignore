@@ -1,6 +1,7 @@
 *.xml
 *.csv
 *.pyc
+*.ipynb
 *.prof
 /all_columns
 move_columns.txt
