@@ -159,7 +159,7 @@
 	"bds": {
 		"sic_range": [54110000,
 		54119999],
-		"emp": "g5",
+		"emp": "l5",
 		"conditional": 5,
 		"ranking": 5
 	},
