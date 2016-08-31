@@ -215,6 +215,7 @@ sales_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS20
 emp_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Emp.txt"
 misc_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Misc.txt"
 company_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Company.txt"
+writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Classifications.txt'
 
 # create dataframe iterators
 sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**2)
@@ -232,7 +233,7 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
     sic_chunk.drop(['SIC2', 'SIC3', 'SIC4', 'SIC6', 'SIC8_2', 'SIC8_3', 'SIC8_4', 'SIC8_5', 'SIC8_6'],
                    axis=1, inplace=True) # We don't need these
     # remove prefix, to not confuse the long to wide algorithm
-    sic_chunk.rename(columns={'SIC8': 'SICHere', 'SICChange':'Change'}, inplace=True)
+    sic_chunk.rename(columns={'SIC8': 'Here', 'SICChange':'Change'}, inplace=True)
     sic_chunk.columns = make_fullyear(list(sic_chunk.columns), 'SIC')  #Fix years on sic
 
     # convert to long, sort, and drop null years
@@ -261,18 +262,19 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
     step2 = make_fullyear(step1, 'C')
     emp_chunk.columns = step2
 
-    # Convert emp to long  and format
+    # Convert emp to long  and set index
     nowlong_emp = pd.wide_to_long(emp_chunk, ['C', 'Emp'], i='DunsNumber', j='year').sort_index().dropna()
     nowlong_emp.index.names = ['DunsNumber', 'FirstYear']
 
     #formatting sales
     sales_chunk.columns = column_replace(list(sales_chunk.columns), 'SalesC', 'C')
-    sales_chunk.rename(columns={'SalesHere': 'Here', 'SalesHereC': 'HereC', 'SalesGrowth': 'Growth', 'SalesGrowthPeer': 'GrowthPeer'}, inplace=True)
+    sales_chunk.rename(columns={'SalesHere': 'Here', 'SalesHereC': 'HereC', 'SalesGrowth': 'Growth',
+                                'SalesGrowthPeer': 'GrowthPeer'}, inplace=True)
     step1 = make_fullyear(list(sales_chunk.columns), 'Sales')
     step2 = make_fullyear(step1, 'C')
     sales_chunk.columns = step2
 
-    #convert sales to long and format
+    #convert sales to long and set index
     nowlong_sales = pd.wide_to_long(sales_chunk, ['C', 'Sales'], i='DunsNumber', j='year').sort_index().dropna()
     nowlong_sales.index.names = ['DunsNumber', 'FirstYear']
 
@@ -285,9 +287,9 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
 
     # write to new txt if first, append to current if not first
     if first:
-        final.to_csv('NETS2013_Classifications.txt', sep='\t')
+        final.to_csv(writepath, sep='\t')
         first = False
     else:
-        final.to_csv('NETS2013_Classifications.txt', sep='\t', mode='a', header=False)
+        final.to_csv(writepath, sep='\t', mode='a', header=False)
 
 
