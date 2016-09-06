@@ -218,11 +218,12 @@ company_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS
 writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Classifications.txt'
 
 # create dataframe iterators
-sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**2)
-misc_df = pd.read_table(misc_filename, usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**2)
-sales_df = pd.read_table(sales_filename, chunksize=10**2)
-emp_df = pd.read_table(emp_filename, chunksize=10**2)
-company_series = pd.read_table(company_filename, usecols=['DunsNumber', 'Company'], index_col=['DunsNumber'], chunksize=10**2)
+sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**6)
+misc_df = pd.read_table(misc_filename, usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**6)
+sales_df = pd.read_table(sales_filename, chunksize=10**6)
+emp_df = pd.read_table(emp_filename, chunksize=10**6)
+company_series = pd.read_table(company_filename, usecols=['DunsNumber', 'Company'], index_col=['DunsNumber'],
+                               chunksize=10**6)
 
 first = True  # Determines whether we write to a new file or append
 for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_df, company_series, sales_df, emp_df,
@@ -284,12 +285,15 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
     #apply classifications to each row as a new column
     classy = Classifier('C:/Users/jc4673/Documents/Columbia/nets_wrangle/json_config.json')
     final['Class'] = final.apply(classy.classify, axis=1)
+    final['YearsActive'] = (final['LastYear'] - final.index.get_level_values(level=1))+1
 
     # write to new txt if first, append to current if not first
     if first:
         final.to_csv(writepath, sep='\t')
         first = False
+        print('.')
     else:
         final.to_csv(writepath, sep='\t', mode='a', header=False)
+        print('.')
 
 
