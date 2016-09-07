@@ -1,4 +1,6 @@
 import pandas as pd
+import Tkinter as tk
+import tkFileDialog as filedialog
 import itertools as it
 import json
 
@@ -210,12 +212,21 @@ def column_replace(column_list, term1, term2):
     return [item.replace(term1,term2) if term1 in item else item for item in column_list]
 
 #define all filenames of interest
+"""
 sic_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
 sales_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Sales.txt"
 emp_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Emp.txt"
 misc_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Misc.txt"
 company_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Company.txt"
 writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Classifications.txt'
+"""
+
+sic_filename = filedialog.askopenfilename(title='sic')
+sales_filename = filedialog.askopenfilename(title='sales')
+emp_filename = filedialog.askopenfilename(title='emp')
+misc_filename = filedialog.askopenfilename(title='misc')
+company_filename = filedialog.askopenfilename(title='company')
+writepath = filedialog.askdirectory(title='writepath') + '/NETS2013_Classifications.txt'
 
 # create dataframe iterators
 sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**6)
