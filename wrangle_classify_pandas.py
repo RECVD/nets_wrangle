@@ -221,12 +221,12 @@ company_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS
 writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Classifications.txt'
 """
 
-sic_filename = filedialog.askopenfilename(title='sic')
-sales_filename = filedialog.askopenfilename(title='sales')
-emp_filename = filedialog.askopenfilename(title='emp')
-misc_filename = filedialog.askopenfilename(title='misc')
-company_filename = filedialog.askopenfilename(title='company')
-writepath = filedialog.askdirectory(title='writepath') + '/NETS2013_Classifications.txt'
+sic_filename = filedialog.askopenfilename(title='Select ASCI SIC File')
+sales_filename = filedialog.askopenfilename(title='Select ASCI Sales File')
+emp_filename = filedialog.askopenfilename(title='Select ASCI Employees File')
+misc_filename = filedialog.askopenfilename(title='Select ASCI Misc File')
+company_filename = filedialog.askopenfilename(title='Select ASCI Company File')
+writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Classifications.txt'
 
 # create dataframe iterators
 sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**6)
