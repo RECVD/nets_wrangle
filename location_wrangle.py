@@ -1,13 +1,23 @@
 import pandas as pd
 import itertools as it
+import Tkinter as tk
+import tkFileDialog as filedialog
 
 first = True #boolean for first iteration, sets whether writing to new fileor appending
 # filenames for all df to be used - later to be replaced by GUI selection
+"""
 company_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Company.txt"
 address_first_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_AddressFirst.txt"
 misc_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Misc.txt"
 move_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\Move_sorted.txt"
-writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Location_test.txt'
+writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Location.txt'
+"""
+
+company_filename = filedialog.askopenfilename(title='Select ASCI Company File')
+address_first_filename = filedialog.askopenfilename(title='Select ASCI Address First File')
+move_filename = filedialog.askopenfilename(title='Select ASCI Move File')
+misc_filename = filedialog.askopenfilename(title='Select ASCI Misc File')
+writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Location.txt'
 
 #read all data frame as generators, chunksize may need to be decreased for low-memory machines
 company_df = pd.read_table(company_filename, index_col=['DunsNumber'],
