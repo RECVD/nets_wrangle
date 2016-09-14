@@ -174,14 +174,14 @@ class Classifier:
         true_keys = []
         for key, _ in self.all_config.iteritems():
             if self.is_class(key, name, sic, emp, sales):
-                true_keys.append(key)
+                true_keys.append(str(key))
             else:
                 continue
 
         if not true_keys:
             return 'not'
         else:
-            return ' ; '.join(true_keys)
+            return ','.join(true_keys)
 
 
 def make_fullyear(partyear_list, prefix):
@@ -212,29 +212,29 @@ def column_replace(column_list, term1, term2):
     return [item.replace(term1,term2) if term1 in item else item for item in column_list]
 
 #define all filenames of interest
-"""
 sic_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
 sales_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Sales.txt"
 emp_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Emp.txt"
 misc_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Misc.txt"
 company_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Company.txt"
-writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Classifications.txt'
-"""
+writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Classificationz.txt'
 
+"""
 sic_filename = filedialog.askopenfilename(title='Select ASCI SIC File')
 sales_filename = filedialog.askopenfilename(title='Select ASCI Sales File')
 emp_filename = filedialog.askopenfilename(title='Select ASCI Employees File')
 misc_filename = filedialog.askopenfilename(title='Select ASCI Misc File')
 company_filename = filedialog.askopenfilename(title='Select ASCI Company File')
-writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Classifications.txt'
+writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Classificationz.txt'
+"""
 
 # create dataframe iterators
-sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**6)
-misc_df = pd.read_table(misc_filename, usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**6)
-sales_df = pd.read_table(sales_filename, chunksize=10**6)
-emp_df = pd.read_table(emp_filename, chunksize=10**6)
+sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**2)
+misc_df = pd.read_table(misc_filename, usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**2)
+sales_df = pd.read_table(sales_filename, chunksize=10**2)
+emp_df = pd.read_table(emp_filename, chunksize=10**2)
 company_series = pd.read_table(company_filename, usecols=['DunsNumber', 'Company'], index_col=['DunsNumber'],
-                               chunksize=10**6)
+                               chunksize=10**2)
 
 first = True  # Determines whether we write to a new file or append
 for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_df, company_series, sales_df, emp_df,
@@ -260,12 +260,21 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
 
     joined = misc_chunk.join(nowlong, how='outer').ffill() #merge in LastYear and fill empty vals forward
 
+    #New data frame with only multi-SIC businesses, ensure 'Change' is 'Yes' for all of these
+    multi = joined['Change'].groupby(level=0).filter(lambda x: len(x) > 1)
+    multi['Change'] = 'Yes'
+
+    #Encorporate change values from multi into joined
+    joined.loc[multi.index]['Change'] = multi['Change']
+    multi_joined = joined[joined['Change'] == 'Yes']
+
     # rectify lastyear column to match actuality
     shift_year = lambda joined: joined.index.get_level_values('FirstYear').to_series().shift(-1)
-    lastyear = joined.groupby(level=0).apply(shift_year) \
-        .combine_first(joined.LastYear).astype(int) \
+    lastyear = multi_joined.groupby(level=0).apply(shift_year) \
+        .combine_first(multi_joined.LastYear).astype(int) \
         .rename('LastYear')
-    joined['LastYear'] = lastyear
+    multi_joined['LastYear'] = lastyear
+    joined.loc[multi_joined.index] = multi_joined
 
     #formatting emp
     emp_chunk.columns = column_replace(list(emp_chunk.columns), 'EmpC', 'C')
