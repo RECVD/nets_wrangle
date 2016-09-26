@@ -7,7 +7,7 @@ import tkFileDialog as filedialog
 def get_highest_cat(cat_list, rankings):
     """Function to get an exclusive category from a list of category based on its ranking"""
     rankings = [rankings[cat.strip()]['ranking'] for cat in cat_list]
-    return cat_list[rankings.index(min(rankings))]
+    return cat_list[rankings.index(min(rankings))].strip()
 
 # All necessary filenames
 """
@@ -20,7 +20,7 @@ filename = filedialog.askopenfilename(title='Select File')
 writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Classifications_Long.txt'
 ranking_config = filedialog.askopenfilename(title='Select Ranking JSON file')
 
-class_df = pd.read_table(filename,  dtype={'FirstYear': int, 'LastYear': int}, chunksize=10**6)
+class_df = pd.read_table(filename,  dtype={'FirstYear': int, 'LastYear': int}, chunksize=10**5)
 
 # Open JSON business rankings file and load into a dict
 with open(ranking_config) as f:
