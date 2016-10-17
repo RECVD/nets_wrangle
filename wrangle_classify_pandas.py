@@ -43,7 +43,7 @@ class Classifier:
             except KeyError:
                 continue
 
-    def is_class(self, config_key, name, sic, emp, sales):
+    def is_class(self, config_key, name, sic, emp, sales, tradename):
         """
         Returns True if the business described belongs to the class described in config_key, returns False otherwise.
         -------
@@ -65,7 +65,7 @@ class Classifier:
         try:
             name_bool = False
             for config_name in local_config['name']:
-                name_bool = config_name.lower() in name.lower()
+                name_bool = config_name.lower() in name.lower() or config_name.lower() in tradename.lower()
                 if name_bool:
                     break
         except KeyError:
@@ -73,7 +73,7 @@ class Classifier:
 
         try:
             sic_exclusive_bool = False
-            sic_exclusive_bool = str(sic) in local_config['sic_exclusive']
+            sic_exclusive_bool = int(sic) in local_config['sic_exclusive']
         except KeyError:
             pass
 
@@ -96,9 +96,9 @@ class Classifier:
         try:
             emp_bool = False
             if local_config['emp'][0] == 'g':
-                emp_bool = emp > int(local_config['emp'][1:])
+                emp_bool = emp >= int(local_config['emp'][1:])
             else:
-                emp_bool = emp < int(local_config['emp'][1:])
+                emp_bool = emp < int(local_config['emp'][1:]) and emp > 0
         except KeyError:
             pass
 
@@ -107,7 +107,7 @@ class Classifier:
             if local_config['sales'][0] == 'g':
                 sales_bool = sales > int(local_config['sales'][1:])
             else:
-                sales_bool = sales < int(local_config['sales'][1:])
+                sales_bool = sales < int(local_config['sales'][1:]) and sales > 0
         except KeyError:
             pass
 
@@ -127,7 +127,7 @@ class Classifier:
             else:
                 return False
         elif condit_code == 4:
-            if sic_exclusive_bool and sic_range_bool:
+            if sic_exclusive_bool or sic_range_bool:
                 return True
             else:
                 return False
@@ -157,7 +157,7 @@ class Classifier:
             else:
                 return False
 
-    def classify(self, row):
+    def classify(self, row, BEH=False):
         """  Classify a business into a category defined in self.all_config.  If no category matches, return 'not'.
         --------------
         Keyword Arguments:
@@ -167,13 +167,17 @@ class Classifier:
         sales:  Yearly sales yield of the business to be classified
         """
         name = row['Company']
-        sic = row['SIC']
+        if BEH == False:
+            sic = row['SIC']
+        else:
+            sic = row['BEH_SIC']
         emp = row['Emp']
         sales = row['Sales']
+        tradename = row['TradeName']
 
         true_keys = []
         for key, _ in self.all_config.iteritems():
-            if self.is_class(key, name, sic, emp, sales):
+            if self.is_class(key, name, sic, emp, sales, tradename):
                 true_keys.append(str(key))
             else:
                 continue
@@ -211,6 +215,13 @@ def column_replace(column_list, term1, term2):
     """Look for term1 in any elements of column_list and replace with term2 when found"""
     return [item.replace(term1,term2) if term1 in item else item for item in column_list]
 
+def BEH_largestpercent(group):
+    #find most used SIC
+    return (max(group['YearsActive'])/sum(group['YearsActive']))*100
+
+def most_common(group):
+    return group.sort_values('YearsActive').iloc[-1].SIC.astype(int)
+
 #define all filenames of interest
 sic_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
 sales_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Sales.txt"
@@ -229,18 +240,17 @@ writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS201
 """
 
 # create dataframe iterators
-sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**2)
-misc_df = pd.read_table(misc_filename, usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**2)
-sales_df = pd.read_table(sales_filename, chunksize=10**2)
-emp_df = pd.read_table(emp_filename, chunksize=10**2)
-company_series = pd.read_table(company_filename, usecols=['DunsNumber', 'Company'], index_col=['DunsNumber'],
-                               chunksize=10**2)
+sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**5)
+misc_df = pd.read_table(misc_filename, usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**5)
+sales_df = pd.read_table(sales_filename, chunksize=10**5)
+emp_df = pd.read_table(emp_filename, chunksize=10**5)
+company_series = pd.read_table(company_filename, usecols=['DunsNumber', 'Company', 'TradeName'], index_col=['DunsNumber'],
+                               chunksize=10**5)
 
 first = True  # Determines whether we write to a new file or append
 for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_df, company_series, sales_df, emp_df,
                                                                             misc_df): # Iterate over all dfs
-
-    sic_chunk['Company'] = company_chunk #add company name to SIC
+    sic_chunk[['Company', 'TradeName']] = company_chunk #add company name to SIC
     sic_chunk.reset_index(inplace=True) #remove index for joining
     sic_chunk.drop(['SIC2', 'SIC3', 'SIC4', 'SIC6', 'SIC8_2', 'SIC8_3', 'SIC8_4', 'SIC8_5', 'SIC8_6'],
                    axis=1, inplace=True) # We don't need these
@@ -302,10 +312,48 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
     #join sales, emp and sic
     final = joined.join(nowlong_sales['Sales'], how='left').join(nowlong_emp['Emp'], how='left')
 
+    # Calculate total active years
+    final['YearsActive'] = (final['LastYear'] - final.index.get_level_values(level=1))+1
+
+    # Filter out businesses that can have different BEH_SIC than SIC (mutlti-sic).  Calculate BEH_largestpercent and
+    # find the most common SIC code.
+    grouped = final[['SIC', 'YearsActive']].groupby(level=0).filter(lambda x: len(x) > 1).groupby(level=0)
+    BEH = grouped.apply(BEH_largestpercent).to_frame()
+    BEH['most_common'] = grouped.apply(most_common)
+    BEH = BEH.rename(columns={0 : 'BEH_LargestPercent'})
+
+    # Create a mask for all BEH < 75 values, and assign TrueFalse to True for them
+    BEH['TrueFalse'] = False
+    criteria = BEH['BEH_LargestPercent'] < 75
+    BEH.loc[criteria, 'TrueFalse'] = True
+
+    # Formatting
+    new = final.loc[BEH.index.get_level_values(level=0).tolist()]
+    BEH = BEH.reindex(pd.MultiIndex.from_tuples(new.index), level=0)
+    BEH.index.rename(('DunsNumber','FirstYear'), inplace=True)
+
+    # Add new columns to final with default values
+    final['BEH_LargestPercent'] = 100.0
+    final['most_common'] = final['SIC'].astype(int)
+    final['BEH_SIC'] = final['SIC'].astype(int)
+    final['TrueFalse'] = False
+
+    #Set final values in BEH to BEH values
+    final.loc[BEH.index, ('BEH_LargestPercent', 'most_common', 'TrueFalse')] = BEH
+    #Assign final values where BEH < 75 to most recent SIC
+    final.loc[final['TrueFalse'] == True, 'BEH_SIC'] = final.loc[final['TrueFalse'] == True, 'Here']
+
+    final.drop(['most_common', 'TrueFalse', 'Here'], axis=1, inplace=True)
+
     #apply classifications to each row as a new column
     classy = Classifier('C:/Users/jc4673/Documents/Columbia/nets_wrangle/json_config.json')
     final['Class'] = final.apply(classy.classify, axis=1)
-    final['YearsActive'] = (final['LastYear'] - final.index.get_level_values(level=1))+1
+    final['BEH_Class'] = final['Class']
+
+    #Apply classifications to BEH_SIC in BEH dataframe and assign those values into final['BEH_Class']
+    BEH[['Company', 'TradeName', 'Emp', 'Sales', 'BEH_SIC']] = final.loc[BEH.index, ('Company', 'TradeName', 'Emp', 'Sales', 'BEH_SIC')]
+    BEH['BEH_Class'] = BEH.apply(classy.classify, axis=1, BEH=True)
+    final.loc[BEH.index, 'BEH_Class'] = BEH['BEH_Class']
 
     # write to new txt if first, append to current if not first
     if first:
