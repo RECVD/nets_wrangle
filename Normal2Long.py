@@ -20,7 +20,7 @@ filename = filedialog.askopenfilename(title='Select File')
 writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Classifications_Long.txt'
 ranking_config = filedialog.askopenfilename(title='Select Ranking JSON file')
 
-class_df = pd.read_table(filename,  dtype={'FirstYear': int, 'LastYear': int}, chunksize=10**5)
+class_df = pd.read_table(filename,  dtype={'FirstYear': int, 'LastYear': int}, chunksize=10**6)
 
 # Open JSON business rankings file and load into a dict
 with open(ranking_config) as f:
@@ -28,6 +28,14 @@ with open(ranking_config) as f:
 
 first = True  # determines whether we write to a new file or append
 for class_chunk in class_df:
+    class_chunk.loc[:, ('LastYear', 'YearsActive')] = class_chunk.loc[:, ('LastYear', 'YearsActive')].astype(int)
+
+    # Apply category rankings for mutually exclusive categories
+    criterion_class = class_chunk['Class'].map(lambda x: len(x) > 3)
+    criterion_beh = class_chunk['BEH_Class'].map(lambda x: len(x) > 3)
+    func = lambda x: get_highest_cat(x.split(','), rankings)
+    class_chunk.loc[criterion_class, 'Class'] = class_chunk['Class'].apply(func)
+    class_chunk.loc[criterion_beh, 'BEH_Class'] = class_chunk['BEH_Class'].apply(func)
 
     # Create a list containing every individual year for this chunk
     firstyear = class_chunk['FirstYear'].tolist()
@@ -51,10 +59,7 @@ for class_chunk in class_df:
 
     # Clear duplicated years for businesses who changed SIC codes
     class_chunk2 = class_chunk2[~class_chunk2.index.duplicated(keep='last')]
-
-    # Apply category rankings for mutually exclusive categories
-    criterion = class_chunk2['Class'].map(lambda x: len(x) > 3)
-    class_chunk2.loc[criterion, 'Class'] = class_chunk2.loc[criterion, 'Class'].apply(lambda x: get_highest_cat(x.split(';'), rankings))
+    del class_chunk2['Change']
 
     # Write to csv
     if first:
