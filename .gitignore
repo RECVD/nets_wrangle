@@ -3,6 +3,7 @@
 *.pyc
 *.ipynb
 *.prof
+*.xlsx
 /all_columns
 move_columns.txt
 NETS2013_LocationsSample.txt
