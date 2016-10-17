@@ -240,12 +240,12 @@ writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS201
 """
 
 # create dataframe iterators
-sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**5)
-misc_df = pd.read_table(misc_filename, usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**5)
-sales_df = pd.read_table(sales_filename, chunksize=10**5)
-emp_df = pd.read_table(emp_filename, chunksize=10**5)
+sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**6)
+misc_df = pd.read_table(misc_filename, usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**6)
+sales_df = pd.read_table(sales_filename, chunksize=10**6)
+emp_df = pd.read_table(emp_filename, chunksize=10**6)
 company_series = pd.read_table(company_filename, usecols=['DunsNumber', 'Company', 'TradeName'], index_col=['DunsNumber'],
-                               chunksize=10**5)
+                               chunksize=10**6)
 
 first = True  # Determines whether we write to a new file or append
 for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_df, company_series, sales_df, emp_df,
