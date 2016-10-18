@@ -98,7 +98,7 @@ class Classifier:
             if local_config['emp'][0] == 'g':
                 emp_bool = emp >= int(local_config['emp'][1:])
             else:
-                emp_bool = emp < int(local_config['emp'][1:]) and emp > 0
+                emp_bool = emp < int(local_config['emp']) and emp > 0
         except KeyError:
             pass
 
@@ -107,7 +107,7 @@ class Classifier:
             if local_config['sales'][0] == 'g':
                 sales_bool = sales > int(local_config['sales'][1:])
             else:
-                sales_bool = sales < int(local_config['sales'][1:]) and sales > 0
+                sales_bool = sales < int(local_config['sales']) and sales > 0
         except KeyError:
             pass
 
