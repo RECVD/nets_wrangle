@@ -157,6 +157,10 @@ class Classifier:
             else:
                 return False
 
+    def get_highest_cat(self, cat_list, rankings):
+        rankings = [rankings[cat.strip()]['ranking'] for cat in cat_list]
+        return cat_list[rankings.index(min(rankings))]
+
     def classify(self, row, BEH=False):
         """  Classify a business into a category defined in self.all_config.  If no category matches, return 'not'.
         --------------
@@ -185,7 +189,7 @@ class Classifier:
         if not true_keys:
             return 'not'
         else:
-            return ','.join(true_keys)
+            return self.get_highest_cat(true_keys)
 
 
 def make_fullyear(partyear_list, prefix):
