@@ -1,7 +1,6 @@
 *.xml
 *.csv
 *.pyc
-*.ipynb
 *.prof
 *.xlsx
 /all_columns

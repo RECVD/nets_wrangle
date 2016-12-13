@@ -222,6 +222,7 @@ def BEH_largestpercent(group):
 def most_common(group):
     return group.sort_values('YearsActive').iloc[-1].SIC.astype(int)
 
+"""
 #define all filenames of interest
 sic_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_SIC.txt"
 sales_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Sales.txt"
@@ -229,15 +230,15 @@ emp_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013
 misc_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Misc.txt"
 company_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Company.txt"
 writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Classificationz.txt'
-
 """
+
+
 sic_filename = filedialog.askopenfilename(title='Select ASCI SIC File')
 sales_filename = filedialog.askopenfilename(title='Select ASCI Sales File')
 emp_filename = filedialog.askopenfilename(title='Select ASCI Employees File')
 misc_filename = filedialog.askopenfilename(title='Select ASCI Misc File')
 company_filename = filedialog.askopenfilename(title='Select ASCI Company File')
 writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Classificationz.txt'
-"""
 
 # create dataframe iterators
 sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**6)
