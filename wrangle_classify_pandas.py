@@ -157,10 +157,6 @@ class Classifier:
             else:
                 return False
 
-    def get_highest_cat(self, cat_list, rankings):
-        rankings = [rankings[cat.strip()]['ranking'] for cat in cat_list]
-        return cat_list[rankings.index(min(rankings))]
-
     def classify(self, row, BEH=False):
         """  Classify a business into a category defined in self.all_config.  If no category matches, return 'not'.
         --------------
@@ -189,8 +185,12 @@ class Classifier:
         if not true_keys:
             return 'not'
         else:
-            return self.get_highest_cat(true_keys)
+            return ', '.join(true_keys)
 
+def get_highest_cat(cat_list, rankings):
+    cat_list = cat_list.strip().split(',')
+    rankings = [rankings[cat.strip()]['ranking'] for cat in cat_list]
+    return cat_list[rankings.index(min(rankings))]
 
 def make_fullyear(partyear_list, prefix):
     """Function to redefine 'partial year', i.e '99' into 'full year', i.e '1999'.
@@ -236,20 +236,27 @@ company_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS
 writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Classificationz.txt'
 """
 
-
 sic_filename = filedialog.askopenfilename(title='Select ASCI SIC File')
 sales_filename = filedialog.askopenfilename(title='Select ASCI Sales File')
 emp_filename = filedialog.askopenfilename(title='Select ASCI Employees File')
 misc_filename = filedialog.askopenfilename(title='Select ASCI Misc File')
 company_filename = filedialog.askopenfilename(title='Select ASCI Company File')
-writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Classificationz.txt'
+writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Classifications.txt'
+rankings_filename = filedialog.askopenfilename(title='Select the category ranking json file')
+dtypes_filename = filedialog.askopenfilename(title='Select the json config file containing dtypes')
+
+# Load JSON configs
+with open(rankings_filename) as f:
+    rankings = json.load(f)
+with open (dtypes_filename) as f:
+    dtypes = json.load(f)
 
 # create dataframe iterators
-sic_df = pd.read_table(sic_filename, index_col=['DunsNumber'], chunksize=10**6)
-misc_df = pd.read_table(misc_filename, usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**6)
-sales_df = pd.read_table(sales_filename, chunksize=10**6)
-emp_df = pd.read_table(emp_filename, chunksize=10**6)
-company_series = pd.read_table(company_filename, usecols=['DunsNumber', 'Company', 'TradeName'], index_col=['DunsNumber'],
+sic_df = pd.read_table(sic_filename, dtype=dtypes['SIC'], index_col=['DunsNumber'], chunksize=10**6)
+misc_df = pd.read_table(misc_filename, dtype=dtypes['Misc'], usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**6)
+sales_df = pd.read_table(sales_filename, dtype=dtypes['Sales'], chunksize=10**6)
+emp_df = pd.read_table(emp_filename, dtype=dtypes['Emp'], chunksize=10**6)
+company_series = pd.read_table(company_filename, dtype=dtypes['Company'], usecols=['DunsNumber', 'Company', 'TradeName'], index_col=['DunsNumber'],
                                chunksize=10**6)
 
 first = True  # Determines whether we write to a new file or append
@@ -352,7 +359,9 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
 
     #apply classifications to each row as a new column
     classy = Classifier('C:/Users/jc4673/Documents/Columbia/nets_wrangle/json_config.json')
-    final['Class'] = final.apply(classy.classify, axis=1)
+    final['Class_List'] = final.apply(classy.classify, axis=1)
+    cat = lambda x: get_highest_cat(x, rankings)
+    final['Class'] = final['Class_List'].apply(cat)
     final['BEH_Class'] = final['Class']
 
     #Apply classifications to BEH_SIC in BEH dataframe and assign those values into final['BEH_Class']
