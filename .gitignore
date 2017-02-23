@@ -4,6 +4,7 @@
 *.prof
 *.xlsx
 *.ipynb
+/in_development
 /all_columns
 move_columns.txt
 NETS2013_LocationsSample.txt
