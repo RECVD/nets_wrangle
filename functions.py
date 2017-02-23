@@ -35,6 +35,7 @@ def l2w_pre(df, varname):
     df:  DataFrame to be transformed from wide to long
     varname:  Column name of the transformed variable
     """
+    
     long_df = pd.wide_to_long(df, [varname], i='DunsNumber', j='year')
     long_df.sort_index(inplace=True)
     long_df.dropna(inplace=True)
@@ -51,7 +52,7 @@ def normalize_df(df, varname, misc):
     varname:  Column name of the tranformed variable
     """
     unique = df[varname].groupby(level=0).unique() #remove duplicates for each DunsNumber
-
+               
     #Create column to denote whether the variable changed at all for each Duns 
     change = unique.apply(lambda x: len(x) > 1).to_frame()
     change.columns = ['Change']
