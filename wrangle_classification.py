@@ -211,7 +211,7 @@ sales_filename = filedialog.askopenfilename(title='Select ASCI Sales File')
 emp_filename = filedialog.askopenfilename(title='Select ASCI Employees File')
 misc_filename = filedialog.askopenfilename(title='Select ASCI Misc File')
 company_filename = filedialog.askopenfilename(title='Select ASCI Company File')
-writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Classifications.txt'
+writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2014_Classifications.txt'
 
 rankings_filename = filedialog.askopenfilename(title='Select the category ranking json file')
 dtypes_filename = filedialog.askopenfilename(title='Select the json config file containing dtypes')
@@ -234,12 +234,14 @@ sales_cols = ['DunsNumber', 'Sales90','Sales91','Sales92','Sales93','Sales94','S
               'Sales09','Sales10','Sales11','Sales12','Sales13','Sales14']
 
 # create dataframe iterators
-sic_df = pd.read_table(sic_filename, dtype=dtypes['SIC'], usecols=sic_cols, index_col=['DunsNumber'], chunksize=10**6)
-misc_df = pd.read_table(misc_filename, dtype=dtypes['Misc'], usecols=['DunsNumber', 'FirstYear', 'LastYear'], chunksize=10**6)
-sales_df = pd.read_table(sales_filename, dtype=dtypes['Sales'], usecols=sales_cols, chunksize=10**6)
-emp_df = pd.read_table(emp_filename, dtype=dtypes['Emp'], usecols=emp_cols, chunksize=10**6)
-company_series = pd.read_table(company_filename, dtype=dtypes['Company'], usecols=['DunsNumber', 'Company', 'TradeName'], index_col=['DunsNumber'],
-                               chunksize=10**6)
+sic_df = pd.read_table(sic_filename, dtype=dtypes['SIC'], usecols=sic_cols, index_col=['DunsNumber'], quoting=3,
+                       chunksize=10**6)
+misc_df = pd.read_table(misc_filename, dtype=dtypes['Misc'], usecols=['DunsNumber', 'FirstYear', 'LastYear'], quoting=3,
+                        chunksize=10**6)
+sales_df = pd.read_table(sales_filename, dtype=dtypes['Sales'], usecols=sales_cols, quoting=3, chunksize=10**6)
+emp_df = pd.read_table(emp_filename, dtype=dtypes['Emp'], usecols=emp_cols, quoting=3, chunksize=10**6)
+company_series = pd.read_table(company_filename, dtype=dtypes['Company'], usecols=['DunsNumber', 'Company', 'TradeName'],
+                               index_col=['DunsNumber'], quoting=3, chunksize=10**6)
 
 first = True  # Determines whether we write to a new file or append
 for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_df, company_series, sales_df, emp_df,
@@ -252,15 +254,8 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
 
     #normalize SIC file
     nowlong = functions.l2w_pre(sic_chunk, 'SIC')
-    try:
-        normal = functions.normalize_df(nowlong, 'SIC', misc_chunk)
-    except ValueError:
-        sic_chunk.to_csv("C:\Users\jc4673\Desktop\sic_chunk.csv")
-        nowlong.to_csv("C:\Users\jc4673\Desktop\ValueError.csv")
-        company_chunk.to_csv("C:\Users\jc4673\Desktop\company_chunk.csv")
-        break
-    print('.\n')
-    """
+    normal = functions.normalize_df(nowlong, 'SIC', misc_chunk)
+
     #formatting emp
     emp_chunk.columns = functions.make_fullyear(list(emp_chunk.columns), 'Emp')
     nowlong_emp = functions.l2w_pre(emp_chunk, 'Emp')
@@ -327,5 +322,4 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
     else:
         final.to_csv(writepath, sep='\t', mode='a', header=False)
         print('.')
-    """
 
