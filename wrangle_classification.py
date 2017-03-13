@@ -303,7 +303,7 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
     final.drop(['most_common', 'TrueFalse', 'Here'], axis=1, inplace=True)
 
     #apply classifications to each row as a new column
-    classy = Classifier('C:/Users/jc4673/Documents/Columbia/nets_wrangle/json_config.json')
+    classy = Classifier(r"O:\nets_wrangle\config\json_config.json")
     final['Class_List'] = final.apply(classy.classify, axis=1)
     cat = lambda x: get_highest_cat(x, rankings)
     final['Class'] = final['Class_List'].apply(cat)
