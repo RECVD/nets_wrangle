@@ -82,7 +82,7 @@ for ad99, ad14, misc_chunk in it.izip(ad99df, ad14df, miscdf):
     normal['BEH_ID'] = normal['BEH_LOC'] * (10 ** 9) + 10 ** 10 + normal.index.get_level_values(level=0)
     normal['Address'] = normal['Address'].map(lambda x: x.strip())
     normal.replace("", np.nan, inplace=True)
-    normal.drop_duplicates(['Address', 'State'], inplace=True)
+    #normal.drop_duplicates(['Address', 'State'], inplace=True)
 
     if first:
         normal.to_csv(writepath, sep='\t', float_format='%.f')
