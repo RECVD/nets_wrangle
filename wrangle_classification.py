@@ -303,7 +303,7 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
     final.loc[BEH.index, ('BEH_LargestPercent', 'most_common', 'TrueFalse')] = BEH
     #Assign final values where BEH < 75 to most recent SIC
     final.loc[final['TrueFalse'] == True, 'BEH_SIC'] = final.loc[final['TrueFalse'] == True, 'Here']
-
+    final.loc[final['TrueFalse'] == False, 'BEH_SIC'] = final.loc[final['TrueFalse'] == False, 'most_common']
     final.drop(['most_common', 'TrueFalse', 'Here'], axis=1, inplace=True)
 
     #apply classifications to each row as a new column
