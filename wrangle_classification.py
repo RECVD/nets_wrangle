@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import Tkinter as tk
 import tkFileDialog as filedialog
@@ -206,15 +207,18 @@ def most_common(group):
 
 
 #define all filenames of interest
-sic_filename = filedialog.askopenfilename(title='Select ASCI SIC File')
-sales_filename = filedialog.askopenfilename(title='Select ASCI Sales File')
-emp_filename = filedialog.askopenfilename(title='Select ASCI Employees File')
-misc_filename = filedialog.askopenfilename(title='Select ASCI Misc File')
-company_filename = filedialog.askopenfilename(title='Select ASCI Company File')
-writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2014_Classifications.txt'
+read_dir = filedialog.askdirectory(title='Select Folder to Read Data From')
+sic_filename = read_dir + '\NETS2014_SIC.txt'
+sales_filename = read_dir + '\NETS2014_Sales.txt'
+emp_filename = read_dir + '\NETS2014_Emp.txt'
+misc_filename = read_dir + '\NETS2014_Misc.txt'
+company_filename = read_dir + '\NETS2014_Company.txt'
+writepath = filedialog.askdirectory(title='Select Folder to Write To') + '/NETS2014_Classifications_test.txt'
 
-rankings_filename = filedialog.askopenfilename(title='Select the category ranking json file')
-dtypes_filename = filedialog.askopenfilename(title='Select the json config file containing dtypes')
+cwd = os.getcwd()
+rankings_filename = cwd + "/category_ranking/ranking_config.json"
+dtypes_filename = cwd + "/config/dtypes.json"
+config_filename = cwd + "/config/json_config.json"
 
 # Load JSON configs
 with open(rankings_filename) as f:
@@ -235,13 +239,13 @@ sales_cols = ['DunsNumber', 'Sales90','Sales91','Sales92','Sales93','Sales94','S
 
 # create dataframe iterators
 sic_df = pd.read_table(sic_filename, dtype=dtypes['SIC'], usecols=sic_cols, index_col=['DunsNumber'], quoting=3,
-                       chunksize=10**6)
+                       chunksize=10**3)
 misc_df = pd.read_table(misc_filename, dtype=dtypes['Misc'], usecols=['DunsNumber', 'FirstYear', 'LastYear'], quoting=3,
-                        chunksize=10**6)
-sales_df = pd.read_table(sales_filename, dtype=dtypes['Sales'], usecols=sales_cols, quoting=3, chunksize=10**6)
-emp_df = pd.read_table(emp_filename, dtype=dtypes['Emp'], usecols=emp_cols, quoting=3, chunksize=10**6)
+                        chunksize=10**3)
+sales_df = pd.read_table(sales_filename, dtype=dtypes['Sales'], usecols=sales_cols, quoting=3, chunksize=10**3)
+emp_df = pd.read_table(emp_filename, dtype=dtypes['Emp'], usecols=emp_cols, quoting=3, chunksize=10**3)
 company_series = pd.read_table(company_filename, dtype=dtypes['Company'], usecols=['DunsNumber', 'Company', 'TradeName'],
-                               index_col=['DunsNumber'], quoting=3, chunksize=10**6)
+                               index_col=['DunsNumber'], quoting=3, chunksize=10**3)
 
 first = True  # Determines whether we write to a new file or append
 for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_df, company_series, sales_df, emp_df,
@@ -272,7 +276,7 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
     # Calculate total active years
     final['YearsActive'] = (final['LastYear'] - final.index.get_level_values(level=1))+1
 
-    # Filter out businesses that can have different BEH_SIC than SIC (mutlti-sic).  Calculate BEH_largestpercent and
+    # Filter out businesses that can have different BEH_SIC than SIC (multi-sic).  Calculate BEH_largestpercent and
     # find the most common SIC code.
     grouped = final[['SIC', 'YearsActive']].groupby(level=0).filter(lambda x: len(x) > 1).groupby(level=0)
     BEH = grouped.apply(BEH_largestpercent).to_frame()
@@ -303,7 +307,7 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
     final.drop(['most_common', 'TrueFalse', 'Here'], axis=1, inplace=True)
 
     #apply classifications to each row as a new column
-    classy = Classifier(r"O:\nets_wrangle\config\json_config.json")
+    classy = Classifier(config_filename)
     final['Class_List'] = final.apply(classy.classify, axis=1)
     cat = lambda x: get_highest_cat(x, rankings)
     final['Class'] = final['Class_List'].apply(cat)
