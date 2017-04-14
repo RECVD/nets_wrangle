@@ -5,31 +5,31 @@ import tkFileDialog as filedialog
 
 first = True #boolean for first iteration, sets whether writing to new fileor appending
 # filenames for all df to be used - later to be replaced by GUI selection
-"""
-company_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Company.txt"
-address_first_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_AddressFirst.txt"
-misc_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\NETS2013_Misc.txt"
-move_filename = "C:\Users\jc4673\Documents\Columbia\NETS_Clients2013ASCI\Move_sorted.txt"
-writepath = 'C:\Users\jc4673\Documents\Columbia\NETS2013_Wrangled\NETS2013_Location.txt'
-"""
 
+company_filename = "E:\NETSDatabase2014\NETS2014_Company.txt"
+address_first_filename = "E:\NETSDatabase2014\NETS2014_AddressFirst.txt"
+misc_filename = "E:\NETSDatabase2014\NETS2014_Misc.txt"
+move_filename = "E:\NETSDatabase2014\NETS2014_Move.txt"
+writepath = r"E:\NETSDatabase2014_wrangled\NETS2014_Location_primsec.txt"
+
+"""
 company_filename = filedialog.askopenfilename(title='Select ASCI Company File')
 address_first_filename = filedialog.askopenfilename(title='Select ASCI Address First File')
 move_filename = filedialog.askopenfilename(title='Select ASCI Move File')
 misc_filename = filedialog.askopenfilename(title='Select ASCI Misc File')
-writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2013_Location.txt'
-
+writepath = filedialog.askdirectory(title='Select File to Write To') + '/NETS2014_Location_primsec.txt'
+"""
 #read all data frame as generators, chunksize may need to be decreased for low-memory machines
 company_df = pd.read_table(company_filename, index_col=['DunsNumber'],
                            usecols=['DunsNumber','Company', 'Address', 'City', 'State', 'ZipCode'],
-                           chunksize=10**2)
+                           chunksize=10**6)
 address_first_df = pd.read_table(address_first_filename, index_col=['DunsNumber'],
                                  usecols=['DunsNumber', 'Address_First', 'City_First', 'CityCode_First',
                                           'State_First', 'ZipCode_First', 'FipsCounty_First'],
-                                 chunksize=10**2)
+                                 chunksize=10**6)
 misc_df = pd.read_table(misc_filename, index_col=['DunsNumber'],
                         usecols=['DunsNumber','FirstYear', 'LastYear', 'Latitude', 'Longitude', 'LevelCode',
-                                 'CityCode', 'FipsCounty'], chunksize=10**2)
+                                 'CityCode', 'FipsCounty'], chunksize=10**6)
 
 #smaller table with mismatched indices so the whole thing gets loaded into memory
 move_df = pd.read_table(move_filename, index_col=['DunsNumber', 'MoveYear'],
@@ -39,6 +39,8 @@ move_df = pd.read_table(move_filename, index_col=['DunsNumber', 'MoveYear'],
                                  'OriginLatitude', 'OriginLongitude', 'OriginLevelCode'])
 
 for company_chunk, add_first_chunk, misc_chunk in it.izip(company_df, address_first_df, misc_df):
+    # index is initially in reverse chronological order
+    move_df.sort_index(inplace=True)
 
     # Join company with necessary piecees from misc
     company_chunk = company_chunk.join(misc_chunk[['LastYear', 'Latitude', 'Longitude', 'LevelCode', 'FipsCounty']])
@@ -102,7 +104,9 @@ for company_chunk, add_first_chunk, misc_chunk in it.izip(company_df, address_fi
     #write to new txt if first, append to current if not first
     if first:
         joined.to_csv(writepath, sep='\t')
+        print('.')
         first = False
     else:
         joined.to_csv(writepath, sep='\t', mode='a', header=False)
+        print('.')
 
