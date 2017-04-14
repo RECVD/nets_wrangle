@@ -9,22 +9,48 @@ def make_fullyear(partyear_list, prefix):
     Keyword Arguments:
     partyear_list:  List of column headers, some of which will include partial years
     prefix:  Prefix that identifies that there will be a partial year following
+
+    If prefix is a list, we assume that all elements in the list have a prefix and it is completely
+    re-formed
     """
-    prefix_len = len(prefix)
-    fullyear_list = []
-    for title in partyear_list:
-        #append as is if the prefix isn't present
-        if title[:prefix_len] != prefix:
-            fullyear_list.append(title)
-        else:
-            #figure out if we'll add '19' or '20', do so and append to the new list
-            partyear = title[prefix_len:]
-            if partyear[0] == '0' or partyear[0] == '1':
-                partyear = prefix + '20'+ partyear
+    if type(prefix) == str:
+        prefix_len = len(prefix)
+        fullyear_list = []
+        for title in partyear_list:
+            #append as is if the prefix isn't present
+            if title[:prefix_len] != prefix:
+                fullyear_list.append(title)
             else:
-                partyear = prefix + '19' + partyear
+                #figure out if we'll add '19' or '20', do so and append to the new list
+                partyear = title[prefix_len:]
+                if partyear[0] == '0' or partyear[0] == '1':
+                    partyear = prefix + '20'+ partyear
+                else:
+                    partyear = prefix + '19' + partyear
+                fullyear_list.append(partyear)
+
+    else:
+        prefix_len = [len(thing) for thing in prefix]
+        prefix_dict = dict(zip(prefix, prefix_len))
+        fullyear_list = []
+        for title in partyear_list:
+            partyear = title[-2:]
+            if partyear[0] == '0' or partyear[0] == '1':
+                fullyear = title[:-2] + '20' + partyear
+            else:
+                fullyear = title[:-2] + '19' + partyear
+
+            fullyear_list.append(fullyear)
+            """
+            #figure out if we'll add '19' or '20', do so and append to the new list
+            partyear = title[prefix_dict[pre]:]
+            if partyear[0] == '0' or partyear[0] == '1':
+                partyear = pre + '20'+ partyear
+            else:
+                partyear = pre + '19' + partyear
             fullyear_list.append(partyear)
-            
+            """
+
     return fullyear_list
 
 
