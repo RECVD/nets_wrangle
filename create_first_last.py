@@ -41,4 +41,4 @@ with open(add99name) as f90, open(add14name) as f14, open(writename, 'w') as wri
         firstyear = headers[firstyear_index]
         lastyear = headers[lastyear_index]
 
-        writefile.write(duns + ',' +  firstyear + ',' + lastyear + ',\n')
+        writefile.write(duns + ',' +  firstyear + ',' + lastyear + '\n')
