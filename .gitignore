@@ -4,6 +4,7 @@
 *.prof
 *.xlsx
 *.ipynb
+*.pdf
 /in_development
 /all_columns
 move_columns.txt
