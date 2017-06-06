@@ -59,11 +59,13 @@ class Classifier:
         local_config = self.all_config[config_key]
         condit_code = local_config['conditional']
 
+        #convert SIC to int
         try:
             sic = int(sic)
         except ValueError:
             sic = None
 
+        # Assess all boolean values, pass if no values are available
         try:
             name_bool = False
             for config_name in local_config['name']:
@@ -99,20 +101,27 @@ class Classifier:
             emp_bool = False
             if local_config['emp'][0] == 'g':
                 emp_bool = emp >= int(local_config['emp'][1:])
+            elif local_config['emp'][0] == 'l':
+                emp_bool = emp < int(local_config['emp'][1:]) and emp > 0
             else:
-                emp_bool = emp < int(local_config['emp']) and emp > 0
+                emp_range = range(*[int(x) for x in local_config['emp'].split(',')])
+                emp_bool = emp in emp_range
         except KeyError:
             pass
 
         try:
             sales_bool = False
             if local_config['sales'][0] == 'g':
-                sales_bool = sales > int(local_config['sales'][1:])
+                sales_bool = sales >= int(local_config['sales'][1:])
+            elif local_config['sales'][0] == 'l':
+                sales_bool = sales < int(local_config['sales'][1:]) and sales > 0
             else:
-                sales_bool = sales < int(local_config['sales']) and sales > 0
+                sales_range = range([int(x) for x in range(local_config['sales'].split(','))])
+                sales_bool = sales in sales_range
         except KeyError:
             pass
 
+        # Assess truth cateogry based on booleans and conditional codes from config file
         if condit_code == 1:
             if name_bool:
                 return True
@@ -158,6 +167,11 @@ class Classifier:
                 return True
             else:
                 return False
+        elif condit_code == 10:
+            if sic_range_bool and emp_bool and sales_bool:
+                return True
+            else:
+                return False
 
     def classify(self, row, BEH=False):
         """  Classify a business into a category defined in self.all_config.  If no category matches, return 'not'.
@@ -187,12 +201,8 @@ class Classifier:
         if not true_keys:
             return 'not'
         else:
-            return ', '.join(true_keys)
+            return ' | '.join(true_keys)
 
-def get_highest_cat(cat_list, rankings):
-    cat_list = cat_list.strip().split(',')
-    rankings = [rankings[cat.strip()]['ranking'] for cat in cat_list]
-    return cat_list[rankings.index(min(rankings))]
 
 def column_replace(column_list, term1, term2):
     """Look for term1 in any elements of column_list and replace with term2 when found"""
@@ -216,13 +226,10 @@ company_filename = read_dir + '\NETS2014_Company.txt'
 writepath = filedialog.askdirectory(title='Select Folder to Write To') + '/NETS2014_Classifications_test.txt'
 
 cwd = os.getcwd()
-rankings_filename = cwd + "/category_ranking/ranking_config.json"
 dtypes_filename = cwd + "/config/dtypes.json"
 config_filename = cwd + "/config/json_config.json"
 
 # Load JSON configs
-with open(rankings_filename) as f:
-    rankings = json.load(f)
 with open (dtypes_filename) as f:
     dtypes = json.load(f)
 
@@ -309,9 +316,7 @@ for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_
     #apply classifications to each row as a new column
     classy = Classifier(config_filename)
     final['Class_List'] = final.apply(classy.classify, axis=1)
-    cat = lambda x: get_highest_cat(x, rankings)
-    final['Class'] = final['Class_List'].apply(cat)
-    final['BEH_Class'] = final['Class']
+    final['BEH_Class'] = final['Class_List'][0] # set default BEH_Class value to start with before reassignment
 
     #Apply classifications to BEH_SIC in BEH dataframe and assign those values into final['BEH_Class']
     BEH[['Company', 'TradeName', 'Emp', 'Sales', 'BEH_SIC']] = final.loc[BEH.index, ('Company', 'TradeName', 'Emp', 'Sales', 'BEH_SIC')]
