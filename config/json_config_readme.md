@@ -12,7 +12,7 @@ Code Keys:
 7. sic\_range OR (sic\_range_2 AND name)
 8. sic_exclusive
 9. sic_exclusive OR name
-10. sic_range AND emp AND sales
+10. sic_range AND emp AND (sales OR NOT sales_present)
 
 
 ####These values in this list correspond to:
@@ -22,5 +22,6 @@ Code Keys:
 - **sic\_range** -> An inclusive range of SIC codes, or list of ranges.  True if the business SIC code is within any of the sic\_ranges
 - **emp** -> Number of business employees.  True if the number of business employees is within the range explicitly specified by the category. Able to handle less than ('l' before number), greater than ('g' before number) or a range (number1,number2)
 - **sales** -> Dollar amount of annual sales.  True if the sales of the business is within the range explicitly specified by the category. Able to handle less than ('l' before number), greater than ('g' before number) or a range (number1,number2)
+- **sales\_present** -> True if there is a value present for sales
 - **sic\_range2** -> same as sic\_range, used if separate ranges apply to different parts of the conditional, as in **Code Key #9**
 

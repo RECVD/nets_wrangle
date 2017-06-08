@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 import Tkinter as tk
 import tkFileDialog as filedialog
 import itertools as it
@@ -121,6 +122,11 @@ class Classifier:
         except KeyError:
             pass
 
+        if np.isnan(sales):
+            sales_present = False
+        else:
+            sales_present = True
+
         # Assess truth cateogry based on booleans and conditional codes from config file
         if condit_code == 1:
             if name_bool:
@@ -168,7 +174,7 @@ class Classifier:
             else:
                 return False
         elif condit_code == 10:
-            if sic_range_bool and emp_bool and sales_bool:
+            if sic_range_bool and emp_bool and (sales_bool or not sales_present):
                 return True
             else:
                 return False
@@ -197,8 +203,7 @@ class Classifier:
                 true_keys.append(str(key))
             else:
                 continue
-
-        if not true_keys:
+if not true_keys:
             return 'not'
         else:
             return ' | '.join(true_keys)
@@ -215,120 +220,120 @@ def BEH_largestpercent(group):
 def most_common(group):
     return group.sort_values('YearsActive').iloc[-1].SIC.astype(int)
 
+if __name__ == "__main__":
+    #define all filenames of interest
+    read_dir = filedialog.askdirectory(title='Select Folder to Read Data From')
+    sic_filename = read_dir + '\NETS2014_SIC.txt'
+    sales_filename = read_dir + '\NETS2014_Sales.txt'
+    emp_filename = read_dir + '\NETS2014_Emp.txt'
+    misc_filename = read_dir + '\NETS2014_Misc.txt'
+    company_filename = read_dir + '\NETS2014_Company.txt'
+    writepath = filedialog.askdirectory(title='Select Folder to Write To') + '/NETS2014_Classifications_test.txt'
 
-#define all filenames of interest
-read_dir = filedialog.askdirectory(title='Select Folder to Read Data From')
-sic_filename = read_dir + '\NETS2014_SIC.txt'
-sales_filename = read_dir + '\NETS2014_Sales.txt'
-emp_filename = read_dir + '\NETS2014_Emp.txt'
-misc_filename = read_dir + '\NETS2014_Misc.txt'
-company_filename = read_dir + '\NETS2014_Company.txt'
-writepath = filedialog.askdirectory(title='Select Folder to Write To') + '/NETS2014_Classifications_test.txt'
+    cwd = os.getcwd()
+    dtypes_filename = cwd + "/config/dtypes.json"
+    config_filename = cwd + "/config/json_config.json"
 
-cwd = os.getcwd()
-dtypes_filename = cwd + "/config/dtypes.json"
-config_filename = cwd + "/config/json_config.json"
+    # Load JSON configs
+    with open (dtypes_filename) as f:
+        dtypes = json.load(f)
 
-# Load JSON configs
-with open (dtypes_filename) as f:
-    dtypes = json.load(f)
+    #dtypes for more efficient reading
+    sic_cols = ['DunsNumber', 'SIC8', 'SIC90', 'SIC91','SIC92','SIC93','SIC94','SIC95','SIC96','SIC97','SIC98','SIC99','SIC00',
+                'SIC01','SIC02','SIC03','SIC04','SIC05','SIC06','SIC07','SIC08','SIC09','SIC10','SIC11','SIC12','SIC13',
+                'SIC14', 'Industry', 'IndustryGroup']
+    emp_cols = ['DunsNumber', 'Emp90','Emp91', 'Emp92','Emp93','Emp94','Emp95','Emp96','Emp97','Emp98','Emp99','Emp00',
+                'Emp01','Emp02','Emp03','Emp04','Emp05','Emp06','Emp07','Emp08','Emp09','Emp10','Emp11','Emp12','Emp13',
+                'Emp14']
+    sales_cols = ['DunsNumber', 'Sales90','Sales91','Sales92','Sales93','Sales94','Sales95','Sales96','Sales97','Sales98',
+                  'Sales99','Sales00','Sales01','Sales02','Sales03','Sales04','Sales05','Sales06','Sales07','Sales08',
+                  'Sales09','Sales10','Sales11','Sales12','Sales13','Sales14']
 
-#dtypes for more efficient reading
-sic_cols = ['DunsNumber', 'SIC8', 'SIC90', 'SIC91','SIC92','SIC93','SIC94','SIC95','SIC96','SIC97','SIC98','SIC99','SIC00',
-            'SIC01','SIC02','SIC03','SIC04','SIC05','SIC06','SIC07','SIC08','SIC09','SIC10','SIC11','SIC12','SIC13',
-            'SIC14', 'Industry', 'IndustryGroup']
-emp_cols = ['DunsNumber', 'Emp90','Emp91', 'Emp92','Emp93','Emp94','Emp95','Emp96','Emp97','Emp98','Emp99','Emp00',
-            'Emp01','Emp02','Emp03','Emp04','Emp05','Emp06','Emp07','Emp08','Emp09','Emp10','Emp11','Emp12','Emp13',
-            'Emp14']
-sales_cols = ['DunsNumber', 'Sales90','Sales91','Sales92','Sales93','Sales94','Sales95','Sales96','Sales97','Sales98',
-              'Sales99','Sales00','Sales01','Sales02','Sales03','Sales04','Sales05','Sales06','Sales07','Sales08',
-              'Sales09','Sales10','Sales11','Sales12','Sales13','Sales14']
+    # create dataframe iterators
+    sic_df = pd.read_table(sic_filename, dtype=dtypes['SIC'], usecols=sic_cols, index_col=['DunsNumber'], quoting=3,
+                           chunksize=10**3)
+    misc_df = pd.read_table(misc_filename, dtype=dtypes['Misc'], usecols=['DunsNumber', 'FirstYear', 'LastYear'], quoting=3,
+                            chunksize=10**3)
+    sales_df = pd.read_table(sales_filename, dtype=dtypes['Sales'], usecols=sales_cols, quoting=3, chunksize=10**3)
+    emp_df = pd.read_table(emp_filename, dtype=dtypes['Emp'], usecols=emp_cols, quoting=3, chunksize=10**3)
+    company_series = pd.read_table(company_filename, dtype=dtypes['Company'], usecols=['DunsNumber', 'Company', 'TradeName'],
+                                   index_col=['DunsNumber'], quoting=3, chunksize=10**3)
 
-# create dataframe iterators
-sic_df = pd.read_table(sic_filename, dtype=dtypes['SIC'], usecols=sic_cols, index_col=['DunsNumber'], quoting=3,
-                       chunksize=10**3)
-misc_df = pd.read_table(misc_filename, dtype=dtypes['Misc'], usecols=['DunsNumber', 'FirstYear', 'LastYear'], quoting=3,
-                        chunksize=10**3)
-sales_df = pd.read_table(sales_filename, dtype=dtypes['Sales'], usecols=sales_cols, quoting=3, chunksize=10**3)
-emp_df = pd.read_table(emp_filename, dtype=dtypes['Emp'], usecols=emp_cols, quoting=3, chunksize=10**3)
-company_series = pd.read_table(company_filename, dtype=dtypes['Company'], usecols=['DunsNumber', 'Company', 'TradeName'],
-                               index_col=['DunsNumber'], quoting=3, chunksize=10**3)
+    first = True  # Determines whether we write to a new file or append
+    for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_df, company_series, sales_df, emp_df,
+                                                                                misc_df): # Iterate over all dfs
+        sic_chunk[['Company', 'TradeName']] = company_chunk #add company name to SIC
+        sic_chunk.reset_index(inplace=True, drop=False) #remove index for joining
+        # remove prefix, to not confuse the long to wide algorithm
+        sic_chunk.rename(columns={'SIC8': 'Here'}, inplace=True)
+        sic_chunk.columns = functions.make_fullyear(list(sic_chunk.columns), 'SIC')  #Fix years on sic
 
-first = True  # Determines whether we write to a new file or append
-for sic_chunk, company_chunk, sales_chunk, emp_chunk, misc_chunk in it.izip(sic_df, company_series, sales_df, emp_df,
-                                                                            misc_df): # Iterate over all dfs
-    sic_chunk[['Company', 'TradeName']] = company_chunk #add company name to SIC
-    sic_chunk.reset_index(inplace=True, drop=False) #remove index for joining
-    # remove prefix, to not confuse the long to wide algorithm
-    sic_chunk.rename(columns={'SIC8': 'Here'}, inplace=True)
-    sic_chunk.columns = functions.make_fullyear(list(sic_chunk.columns), 'SIC')  #Fix years on sic
+        #normalize SIC file
+        nowlong = functions.l2w_pre(sic_chunk, 'SIC')
+        normal = functions.normalize_df(nowlong, 'SIC', misc_chunk)
 
-    #normalize SIC file
-    nowlong = functions.l2w_pre(sic_chunk, 'SIC')
-    normal = functions.normalize_df(nowlong, 'SIC', misc_chunk)
+        #formatting emp
+        emp_chunk.columns = functions.make_fullyear(list(emp_chunk.columns), 'Emp')
+        nowlong_emp = functions.l2w_pre(emp_chunk, 'Emp')
+        nowlong_emp.index.rename(['DunsNumber', 'FirstYear'], inplace=True)
 
-    #formatting emp
-    emp_chunk.columns = functions.make_fullyear(list(emp_chunk.columns), 'Emp')
-    nowlong_emp = functions.l2w_pre(emp_chunk, 'Emp')
-    nowlong_emp.index.rename(['DunsNumber', 'FirstYear'], inplace=True)
+        #formatting sales
+        sales_chunk.columns = functions.make_fullyear(list(sales_chunk.columns), 'Sales')
+        nowlong_sales = functions.l2w_pre(sales_chunk, 'Sales')
+        nowlong_sales.index.rename(['DunsNumber', 'FirstYear'], inplace=True)
 
-    #formatting sales
-    sales_chunk.columns = functions.make_fullyear(list(sales_chunk.columns), 'Sales')
-    nowlong_sales = functions.l2w_pre(sales_chunk, 'Sales')
-    nowlong_sales.index.rename(['DunsNumber', 'FirstYear'], inplace=True)
+        #join sales, emp and sic
+        final = normal.join(nowlong_sales['Sales'], how='left').join(nowlong_emp['Emp'], how='left')
 
-    #join sales, emp and sic
-    final = normal.join(nowlong_sales['Sales'], how='left').join(nowlong_emp['Emp'], how='left')
+        # Calculate total active years
+        final['YearsActive'] = (final['LastYear'] - final.index.get_level_values(level=1))+1
 
-    # Calculate total active years
-    final['YearsActive'] = (final['LastYear'] - final.index.get_level_values(level=1))+1
+        # Filter out businesses that can have different BEH_SIC than SIC (multi-sic).  Calculate BEH_largestpercent and
+        # find the most common SIC code.
+        grouped = final[['SIC', 'YearsActive']].groupby(level=0).filter(lambda x: len(x) > 1).groupby(level=0)
+        BEH = grouped.apply(BEH_largestpercent).to_frame()
+        BEH['most_common'] = grouped.apply(most_common)
+        BEH = BEH.rename(columns={0 : 'BEH_LargestPercent'})
 
-    # Filter out businesses that can have different BEH_SIC than SIC (multi-sic).  Calculate BEH_largestpercent and
-    # find the most common SIC code.
-    grouped = final[['SIC', 'YearsActive']].groupby(level=0).filter(lambda x: len(x) > 1).groupby(level=0)
-    BEH = grouped.apply(BEH_largestpercent).to_frame()
-    BEH['most_common'] = grouped.apply(most_common)
-    BEH = BEH.rename(columns={0 : 'BEH_LargestPercent'})
+        # Create a mask for all BEH < 75 values, and assign TrueFalse to True for them
+        BEH['TrueFalse'] = False
+        criteria = BEH['BEH_LargestPercent'] < 75
+        BEH.loc[criteria, 'TrueFalse'] = True
 
-    # Create a mask for all BEH < 75 values, and assign TrueFalse to True for them
-    BEH['TrueFalse'] = False
-    criteria = BEH['BEH_LargestPercent'] < 75
-    BEH.loc[criteria, 'TrueFalse'] = True
+        # Formatting
+        new = final.loc[BEH.index.get_level_values(level=0).tolist()]
+        BEH = BEH.reindex(pd.MultiIndex.from_tuples(new.index), level=0)
+        BEH.index.rename(('DunsNumber','FirstYear'), inplace=True)
 
-    # Formatting
-    new = final.loc[BEH.index.get_level_values(level=0).tolist()]
-    BEH = BEH.reindex(pd.MultiIndex.from_tuples(new.index), level=0)
-    BEH.index.rename(('DunsNumber','FirstYear'), inplace=True)
+        # Add new columns to final with default values
+        final['BEH_LargestPercent'] = 100.0
+        final['most_common'] = final['SIC'].astype(int)
+        final['BEH_SIC'] = final['SIC'].astype(int)
+        final['TrueFalse'] = False
 
-    # Add new columns to final with default values
-    final['BEH_LargestPercent'] = 100.0
-    final['most_common'] = final['SIC'].astype(int)
-    final['BEH_SIC'] = final['SIC'].astype(int)
-    final['TrueFalse'] = False
+        #Set final values in BEH to BEH values
+        final.loc[BEH.index, ('BEH_LargestPercent', 'most_common', 'TrueFalse')] = BEH
+        #Assign final values where BEH < 75 to most recent SIC
+        final.loc[final['TrueFalse'] == True, 'BEH_SIC'] = final.loc[final['TrueFalse'] == True, 'Here']
+        final.loc[final['TrueFalse'] == False, 'BEH_SIC'] = final.loc[final['TrueFalse'] == False, 'most_common']
+        final.drop(['most_common', 'TrueFalse', 'Here'], axis=1, inplace=True)
 
-    #Set final values in BEH to BEH values
-    final.loc[BEH.index, ('BEH_LargestPercent', 'most_common', 'TrueFalse')] = BEH
-    #Assign final values where BEH < 75 to most recent SIC
-    final.loc[final['TrueFalse'] == True, 'BEH_SIC'] = final.loc[final['TrueFalse'] == True, 'Here']
-    final.loc[final['TrueFalse'] == False, 'BEH_SIC'] = final.loc[final['TrueFalse'] == False, 'most_common']
-    final.drop(['most_common', 'TrueFalse', 'Here'], axis=1, inplace=True)
+        #apply classifications to each row as a new column
+        classy = Classifier(config_filename)
+        final['Class_List'] = final.apply(classy.classify, axis=1)
+        final['BEH_Class'] = final['Class_List'][0] # set default BEH_Class value to start with before reassignment
 
-    #apply classifications to each row as a new column
-    classy = Classifier(config_filename)
-    final['Class_List'] = final.apply(classy.classify, axis=1)
-    final['BEH_Class'] = final['Class_List'][0] # set default BEH_Class value to start with before reassignment
+        #Apply classifications to BEH_SIC in BEH dataframe and assign those values into final['BEH_Class']
+        BEH[['Company', 'TradeName', 'Emp', 'Sales', 'BEH_SIC']] = final.loc[BEH.index, ('Company', 'TradeName', 'Emp', 'Sales', 'BEH_SIC')]
+        BEH['BEH_Class'] = BEH.apply(classy.classify, axis=1, BEH=True)
+        final.loc[BEH.index, 'BEH_Class'] = BEH['BEH_Class']
 
-    #Apply classifications to BEH_SIC in BEH dataframe and assign those values into final['BEH_Class']
-    BEH[['Company', 'TradeName', 'Emp', 'Sales', 'BEH_SIC']] = final.loc[BEH.index, ('Company', 'TradeName', 'Emp', 'Sales', 'BEH_SIC')]
-    BEH['BEH_Class'] = BEH.apply(classy.classify, axis=1, BEH=True)
-    final.loc[BEH.index, 'BEH_Class'] = BEH['BEH_Class']
-
-    # write to new txt if first, append to current if not first
-    if first:
-        final.to_csv(writepath, sep='\t')
-        first = False
-        print('.')
-    else:
-        final.to_csv(writepath, sep='\t', mode='a', header=False)
-        print('.')
+        # write to new txt if first, append to current if not first
+        if first:
+            final.to_csv(writepath, sep='\t')
+            first = False
+            print('.')
+        else:
+            final.to_csv(writepath, sep='\t', mode='a', header=False)
+            print('.')
 
