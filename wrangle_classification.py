@@ -203,7 +203,8 @@ class Classifier:
                 true_keys.append(str(key))
             else:
                 continue
-if not true_keys:
+
+        if not true_keys:
             return 'not'
         else:
             return ' | '.join(true_keys)
