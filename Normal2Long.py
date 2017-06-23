@@ -11,7 +11,6 @@ def get_highest_cat(cat_list, rankings):
 
 def normal2long(df):
     """
-    Requires a YearsActive column
     :param df:
     :return:
     """
@@ -22,11 +21,6 @@ def normal2long(df):
     lastyear = df['LastYear'].tolist()
     year_nested = [range(x, y+1) for x,y in zip(firstyear, lastyear)]
     year = pd.Series([item for sublist in year_nested for item in sublist])
-
-
-
-    #is_multiyear = class_chunk['YearsActive'] > 1  #  Find all multiyear businesses
-    #df_try = class_chunk[is_multiyear]
 
     # Make multiple entries for each business active for >1 year
     class_chunk2 = df.loc[np.repeat(df.index.values, df['YearsActive'])].reset_index(drop=True)
