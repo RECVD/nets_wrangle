@@ -108,3 +108,53 @@ def normalize_df(df, varname, misc):
     
     return joined
 
+
+def normalize_nomisc(df, var1, var2):
+    """"
+    Changes database from long form to normalized form, only including updates and removing redundant data
+
+    df: DataFrame in the long format.  Should have MultiIndex (DunsNumber, Year)
+    varname:  Column name of the tranformed variable
+    """
+
+    #Generate df of FirstYear and LastYear
+    df.reset_index(inplace=True, drop=False)
+    grouped = df[['DunsNumber', 'Year']].groupby('DunsNumber')
+    firstyear = grouped.first().rename(columns={'Year': 'FirstYear'})
+    lastyear = grouped.last().rename(columns={'Year': 'LastYear'})
+    misc = pd.concat([firstyear, lastyear], axis=1)
+    misc.set_index('FirstYear', append=True, inplace=True)
+    df.set_index(['DunsNumber', 'Year'], inplace=True)
+
+    unique_var1 = df[var1].groupby(level=0).unique() #remove duplicates for each DunsNumber
+    unique_var2 = df[var2].groupby(level=0).unique()
+
+    #Create column to denote whether the variable changed at all for each Duns
+    change1 = unique_var1.apply(lambda x: len(x) > 1).to_frame()
+    change2 = unique_var2.apply(lambda x: len(x) > 1).to_frame()
+    change = (change1[var1] | change2[var2]).to_frame()
+    change.columns = ['Change']
+    df = change.join(df)
+
+    #Drop duplicates, add DunsNumber as column to ensure no deletion between different businesses with identical rows
+    df['DunsNumber'] = df.index.get_level_values(level=0)
+    df = df.drop_duplicates()
+    del df['DunsNumber']
+    df.index.names = ['DunsNumber', 'FirstYear'] #formatting
+
+    #Join FirstYear and LastYear in from misc, and fill values forward
+    joined = misc.join(df, how='outer')
+    joined['LastYear'] = joined['LastYear'].groupby(level=0).ffill()
+    multi = joined[joined['Change'] == True] #df with only businesses that had changes
+
+    #Diagonal shift to fix years for multi businesses
+    shift_year = lambda joined: joined.index.get_level_values('FirstYear').to_series().shift(-1)
+    lastyear = multi.groupby(level=0).apply(shift_year).combine_first(multi['LastYear']).astype(int).rename('Lastyear')
+    multi['LastYear'] = lastyear
+
+    #Join multi fixes into the original df and remove the Change column
+    joined.loc[multi.index] = multi
+    del joined['Change']
+
+    return joined
+
