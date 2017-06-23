@@ -1,12 +1,15 @@
 from itertools import izip
+import Tkinter as tk
+import tkFileDialog as filedialog
 import functions as fx
 
-# Filenames
-add99name = "E:\NETSDatabase2014\NETS2014_AddressSpecial90to99.txt"
-add14name = "E:\NETSDatabase2014\NETS2014_AddressSpecial00to14.txt"
-writename = "E:\NETSDatabase2014_wrangled\NETS2014_FirstLast.csv"
+read_dir = filedialog.askdirectory(title='Select Folder to Read Data From')
+add99name = read_dir + '/NETS2014_AddressSpecial90to99.txt'
+add14name = read_dir + '/NETS2014_AddressSpecial00to14.txt'
+writepath = filedialog.askdirectory(title='Select Folder to Write To') + '/NETS2014_FirstLast.csv'
 
-with open(add99name) as f90, open(add14name) as f14, open(writename, 'w') as writefile:
+
+with open(add99name) as f90, open(add14name) as f14, open(writepath, 'w') as writefile:
     # Match up each index with it's year based on the first line
     line1_90 = f90.readline().strip().split('\t')[1:]
     line1_14 = f14.readline().strip().split('\t')[1:]
