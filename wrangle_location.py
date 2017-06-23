@@ -1,28 +1,35 @@
 import pandas as pd
 import numpy as np
-import random
+import Tkinter as tk
+import tkFileDialog as filedialog
 import itertools as it
 
 import functions
 
+read_dir = filedialog.askdirectory(title='Select Folder to Read Data From')
+add99name = read_dir + '/NETS2014_AddressSpecial90to99.txt'
+add14name = read_dir + '/NETS2014_AddressSpecial00to14.txt'
+firstlastname = read_dir + '/NETS2014_FirstLast.csv'
+writepath = filedialog.askdirectory(title='Select Folder to Write To') + '/NETS2014_Location_test.txt'
+
+"""
 # Filenames
 add99name = "E:\NETS2014_AddressSpecial90to99.txt"
 add14name = "E:\NETS2014_AddressSpecial00to14.txt"
-miscname = "E:\NETSDatabase2014\NETS2014_Misc.txt"
+firstlastname = "E:\NETSDatabase2014\NETS2014_Misc.txt"
 writepath = "E:\NETSDatabase2014_wrangled\NETS2014_Location.txt"
+"""
 
 
 #have to rework this to preset column dtypes
 # Create reading iterators
-ad99df = pd.read_table(add99name, index_col=['DunsNumber'],  error_bad_lines=False, chunksize=10**6)
-ad14df = pd.read_table(add14name, index_col=['DunsNumber'], error_bad_lines=False, chunksize=10**6)
-miscdf = pd.read_table(miscname, usecols=['DunsNumber', 'FirstYear', 'LastYear'],
-                       dtype={'DunsNumber': np.int32, 'FirstYear': np.int64, 'LastYear': np.int32},
-                       chunksize=10**6)
-
+ad99df = pd.read_table(add99name, index_col=['DunsNumber'],  error_bad_lines=False, chunksize=10**2)
+ad14df = pd.read_table(add14name, index_col=['DunsNumber'], error_bad_lines=False, chunksize=10**2)
+firstlastdf = pd.read_table(firstlastname, dtype={'DunsNumber': np.int32, 'FirstYear': np.int64, 'LastYear': np.int32},
+                       chunksize=10**2)
 
 first = True #used for writing purposes to determine first iteration
-for ad99, ad14, misc_chunk in it.izip(ad99df, ad14df, miscdf):
+for ad99, ad14, firstlast in it.izip(ad99df, ad14df, firstlastdf):
     #combine dataframes across years, drop rows with no values
     ad99 = pd.concat([ad99, ad14], axis=1)
     ad99.dropna(how='all', inplace=True)
@@ -77,7 +84,7 @@ for ad99, ad14, misc_chunk in it.izip(ad99df, ad14df, miscdf):
 
     #Join, normalize, strip strings, replace empty str with NaN and drop duplicated lines
     addcity = address_l.join(city_l).join(state_l).join(zipp_l).join(citycode_l).join(fips_l).join(cbsa_l)
-    normal = functions.normalize_df(addcity, 'Address', misc_chunk)
+    normal = functions.normalize_nomisc(addcity, 'Address', 'City')
     normal['BEH_LOC'] = normal.groupby(level=0).cumcount() + 1
     normal['BEH_ID'] = normal['BEH_LOC'] * (10 ** 9) + 10 ** 10 + normal.index.get_level_values(level=0)
     normal['Address'] = normal['Address'].map(lambda x: x.strip())

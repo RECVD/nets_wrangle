@@ -62,7 +62,7 @@ def l2w_pre(df, varname):
     varname:  Column name of the transformed variable
     """
     
-    long_df = pd.wide_to_long(df, [varname], i='DunsNumber', j='year')
+    long_df = pd.wide_to_long(df, [varname], i='DunsNumber', j='Year')
     long_df.sort_index(inplace=True)
     long_df.dropna(inplace=True)
     
