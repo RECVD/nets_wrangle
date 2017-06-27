@@ -1,4 +1,5 @@
 import pandas as pd
+import random
 
 # Function Definitions
 
@@ -157,4 +158,10 @@ def normalize_nomisc(df, var1, var2):
     del joined['Change']
 
     return joined
+
+def random_sample(df, num_values):
+    duns_sample = random.sample(df['DunsNumber'].unique().tolist(), num_values)
+    df_sample = df[df['DunsNumber'].isin(duns_sample)].set_index(['DunsNumber', 'FirstYear'])
+
+    return df_sample
 
