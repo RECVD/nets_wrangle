@@ -12,21 +12,12 @@ add14name = read_dir + '/NETS2014_AddressSpecial00to14.txt'
 firstlastname = read_dir + '/NETS2014_FirstLast.csv'
 writepath = filedialog.askdirectory(title='Select Folder to Write To') + '/NETS2014_Location_test.txt'
 
-"""
-# Filenames
-add99name = "E:\NETS2014_AddressSpecial90to99.txt"
-add14name = "E:\NETS2014_AddressSpecial00to14.txt"
-firstlastname = "E:\NETSDatabase2014\NETS2014_Misc.txt"
-writepath = "E:\NETSDatabase2014_wrangled\NETS2014_Location.txt"
-"""
-
-
 #have to rework this to preset column dtypes
 # Create reading iterators
-ad99df = pd.read_table(add99name, index_col=['DunsNumber'],  error_bad_lines=False, chunksize=10**2)
-ad14df = pd.read_table(add14name, index_col=['DunsNumber'], error_bad_lines=False, chunksize=10**2)
+ad99df = pd.read_table(add99name, index_col=['DunsNumber'],  error_bad_lines=False, chunksize=10**6)
+ad14df = pd.read_table(add14name, index_col=['DunsNumber'], error_bad_lines=False, chunksize=10**6)
 firstlastdf = pd.read_table(firstlastname, dtype={'DunsNumber': np.int32, 'FirstYear': np.int64, 'LastYear': np.int32},
-                       chunksize=10**2)
+                       chunksize=10**6)
 
 first = True #used for writing purposes to determine first iteration
 for ad99, ad14, firstlast in it.izip(ad99df, ad14df, firstlastdf):
