@@ -76,7 +76,7 @@ for ad99, ad14, firstlast in it.izip(ad99df, ad14df, firstlastdf):
     #Join, normalize, strip strings, replace empty str with NaN and drop duplicated lines
     addcity = address_l.join(city_l).join(state_l).join(zipp_l).join(citycode_l).join(fips_l).join(cbsa_l)
     normal = functions.normalize_nomisc(addcity, 'Address', 'City')
-    normal['BEH_LOC'] = normal.groupby(level=0).cumcount() + 1
+    normal['BEH_LOC'] = normal.groupby(level=0).cumcount(ascending=False)
     normal['BEH_ID'] = normal['BEH_LOC'] * (10 ** 9) + 10 ** 10 + normal.index.get_level_values(level=0)
     normal['Address'] = normal['Address'].map(lambda x: x.strip())
     normal.replace("", np.nan, inplace=True)
