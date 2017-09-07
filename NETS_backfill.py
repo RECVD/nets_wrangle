@@ -14,7 +14,7 @@ crosswalk_file = filedialog.askopenfilename(title= 'Please select the crosswalk 
 writepath =  filedialog.askdirectory(title="Select Folder to write to") + '/NETS2014_Location_bfill.txt'
 
 loc = pd.read_table(location_file, index_col=['DunsNumber', 'BEH_LOC'])
-quality = pd.read_table(quality_file, dtype={'beh_id' : 'int64', 'Loc_name': 'string'})
+quality = pd.read_table(quality_file, dtype={'BEH_ID' : 'int64', 'Loc_name': 'object'})
 crosswalk = pd.read_csv(crosswalk_file)
 
 # Rename columns for comparison, set & sort indices for joining
@@ -29,9 +29,7 @@ quality.sort_index(inplace=True)
 #Join quality to crosswalk (which is to help join quality to location)
 qual = quality.join(crosswalk, how='left')
 
-# NANs were present in data presented by James, only 137 records so i'll just drop them
 # Reset Index to include DunsNumber and sort
-qual.dropna(subset=['Loc_name'], inplace=True)
 qual.reset_index(inplace=True)
 qual.set_index(['DunsNumber', 'BEH_LOC'], inplace=True)
 del qual['BEH_ID']
@@ -53,7 +51,7 @@ del loc_bad_full['BEH_LOC']
 del loc_bad_full['BEH_ID']
 
 #Subsetted loc to long
-loc_long = n2l.normal2long(loc_bad_full)
+loc_long = n2l.normal2long(loc_bad_full).sort_index()
 
 nancopy = loc_long.copy() # Need to keep around original for joining back in
 nancopy[nancopy['Loc_name'].isin(['Zipcode', 'PlacesAdmin', 'NameStreet'])] = np.nan # Unnaceptable to nan
