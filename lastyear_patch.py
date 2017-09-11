@@ -100,15 +100,21 @@ full_dupes_cut.set_index('FirstYear', append=True, inplace=True)
 full_dupes_cut['YearsActive'] = full_dupes_cut['LastYear'] - full_dupes_cut.index.get_level_values(1)
 loc_cut[loc_cut.index.isin(full_dupes_cut.index.get_level_values(0).tolist(), level=0)] = full_dupes_cut
 
-# Write to file
+
 del loc_cut['YearsActive']
 loc_cut.dropna(subset=['LastYear', 'ZIP'], inplace=True) #Two lingering bad records
 loc_cut.reset_index(inplace=True)
+
+#Fix LastYears to avoid overlap
+loc_subset = loc_cut[loc_cut['BEH_LOC'] != 0]
+loc_subset['LastYear'] = loc_subset['LastYear'] - 1
+loc_cut = pd.concat([loc_subset, loc_cut[loc_cut['BEH_LOC'] == 0]]).sort_index()
 
 # Fix dtypes
 dtypes = loc.dtypes.combine_first(loc_cut.dtypes)
 for k, v in dtypes.iteritems():
     loc_cut[k] = loc_cut[k].astype(v).astype("object")
 
+# Write to file
 loc_cut.reset_index(drop=False, inplace=True)
 loc_cut.to_csv(writepath, sep='\t', index=False)
