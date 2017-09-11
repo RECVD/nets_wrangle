@@ -38,6 +38,9 @@ qual.sort_index(inplace=True)
 #Join qual to loc
 loc_qual = qual.join(loc, how='inner')
 
+#Add flag column to indicate backfilling
+loc_qual['backfill_flag'] = 0
+
 #Get all of them with bad DunsNumber
 loc_bad = loc_qual[loc_qual['Loc_name'].isin(['Zipcode', 'PlacesAdmin'])]
 loc_bad_full = loc_qual[loc_qual.index.isin(loc_bad.index.get_level_values(0).tolist(), level=0)]
@@ -55,8 +58,11 @@ loc_long = n2l.normal2long(loc_bad_full).sort_index()
 
 nancopy = loc_long.copy() # Need to keep around original for joining back in
 nancopy[nancopy['Loc_name'].isin(['Zipcode', 'PlacesAdmin', 'NameStreet'])] = np.nan # Unnaceptable to nan
+nancopy.loc[nancopy['backfill_flag'].isnull(), ['backfill_flag']]= 1
 # Backfill, and combine back to the original with backfilled having priority
-loc_long_bfill = nancopy.groupby(level=0).bfill().combine_first(loc_long)
+loc_long_bfill = nancopy.groupby(level=0).bfill()
+loc_long_bfill.loc[loc_long_bfill['ZIP'].isnull(), ['backfill_flag']]= 0
+loc_long_bfill = loc_long_bfill.combine_first(loc_long)
 
 normal = fx.normalize_nomisc(loc_long_bfill, 'Address', 'City') #Re-normalize
 
@@ -86,6 +92,7 @@ loc_qual['FipsCounty'] = loc_qual['FipsCounty'].astype('int64')
 loc_qual['CBSA'] = loc_qual['CBSA'].astype('int64')
 loc_qual['BEH_LOC'] = loc_qual['BEH_LOC'].astype('int64')
 loc_qual['BEH_ID'] = loc_qual['BEH_ID'].astype('int64')
+loc_qual['backfill_flag'] = loc_qual['backfill_flag'].astype('int64')
 
 
 #Change again to str stype for writing
@@ -95,5 +102,5 @@ for col in loc_qual.columns:
 
 loc_qual.reset_index(inplace=True, drop=False)
 
-loc_qual.to_csv(writepath, sep='\t', index=False)
+#loc_qual.to_csv(writepath, sep='\t', index=False)
 
