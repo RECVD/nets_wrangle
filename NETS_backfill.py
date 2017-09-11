@@ -14,7 +14,7 @@ crosswalk_file = filedialog.askopenfilename(title= 'Please select the crosswalk 
 writepath =  filedialog.askdirectory(title="Select Folder to write to") + '/NETS2014_Location_bfill.txt'
 
 loc = pd.read_table(location_file, index_col=['DunsNumber', 'BEH_LOC'])
-quality = pd.read_table(quality_file, dtype={'BEH_ID' : 'int64', 'Loc_name': 'object'})
+quality = pd.read_table(quality_file, dtype={'BEH_ID': 'int64', 'Loc_name': 'object'})
 crosswalk = pd.read_csv(crosswalk_file)
 
 # Rename columns for comparison, set & sort indices for joining
@@ -49,10 +49,6 @@ loc_bad_full = loc_qual[loc_qual.index.isin(loc_bad.index.get_level_values(0).to
 loc_bad_full = loc_bad_full.groupby(level=0).filter(lambda x: len(x) > 1)
 loc_bad_full.reset_index(drop=False, inplace=True)
 
-# Cleanup
-del loc_bad_full['BEH_LOC']
-del loc_bad_full['BEH_ID']
-
 #Subsetted loc to long
 loc_long = n2l.normal2long(loc_bad_full).sort_index()
 
@@ -65,10 +61,6 @@ loc_long_bfill.loc[loc_long_bfill['ZIP'].isnull(), ['backfill_flag']]= 0
 loc_long_bfill = loc_long_bfill.combine_first(loc_long)
 
 normal = fx.normalize_nomisc(loc_long_bfill, 'Address', 'City') #Re-normalize
-
-# Compute new BEH_LOC and BEH_ID
-normal['BEH_LOC'] = normal.groupby(level=0).cumcount() + 1
-normal['BEH_ID'] = normal['BEH_LOC'] * (10 ** 9) + 10 ** 10 + normal.index.get_level_values(level=0)
 
 # Housekeeping
 loc_qual.reset_index(inplace=True, drop=False)
