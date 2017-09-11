@@ -81,7 +81,7 @@ loc_qual.dropna(how='all', inplace=True)
 
 #switch the order
 col_order = ['LastYear', 'Address', 'City', 'State', 'ZIP', 'citycode', 'FipsCounty', 'CBSA', 'Loc_name', 'BEH_LOC',
-             'BEH_ID']
+             'BEH_ID', 'backfill_flag']
 loc_qual = loc_qual[col_order]
 
 #change types (the hard way) for writing
@@ -102,5 +102,5 @@ for col in loc_qual.columns:
 
 loc_qual.reset_index(inplace=True, drop=False)
 
-#loc_qual.to_csv(writepath, sep='\t', index=False)
+loc_qual.to_csv(writepath, sep='\t', index=False)
 
