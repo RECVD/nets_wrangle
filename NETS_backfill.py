@@ -88,11 +88,11 @@ loc_qual['backfill_flag'] = loc_qual['backfill_flag'].astype('int64')
 
 
 #Change again to str stype for writing
+loc_qual.sort_index(inplace=True)
 loc_qual.reset_index(drop=False, inplace=True)
 for col in loc_qual.columns:
     loc_qual[col] = loc_qual[col].astype('object')
 
-loc_qual.reset_index(inplace=True, drop=False)
 
 loc_qual.to_csv(writepath, sep='\t', index=False)
 
