@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import random
 
@@ -149,12 +150,13 @@ def normalize_nomisc(df, var1, var2):
     multi = joined[joined['Change'] == True] #df with only businesses that had changes
 
     #Diagonal shift to fix years for multi businesses
-    shift_year = lambda joined: joined.index.get_level_values('FirstYear').to_series().shift(-1)
-    lastyear = multi.groupby(level=0).apply(shift_year).combine_first(multi['LastYear']).astype(int).rename('Lastyear')
+    shift_year = lambda joined: joined.index.get_level_values('FirstYear').to_series().shift(-1) - 1
+    lastyear = multi.groupby(level=0).apply(shift_year).combine_first(multi['LastYear']).rename('Lastyear')
     multi['LastYear'] = lastyear
 
     #Join multi fixes into the original df and remove the Change column
     joined.loc[multi.index] = multi
+    joined['LastYear'] = joined['LastYear'].astype('int64')
     del joined['Change']
 
     return joined
@@ -165,3 +167,32 @@ def random_sample(df, num_values):
 
     return df_sample
 
+def normal2long(df):
+    """
+    Transforms a data frame from the normal format to the long one
+
+    parameters:  df:  a data frame with a numerical index
+    """
+    # Create a list containing every individual year for this chunk
+
+    df['YearsActive'] = df['LastYear'] - df['FirstYear'] + 1
+    firstyear = df['FirstYear'].tolist()
+    lastyear = df['LastYear'].tolist()
+    year_nested = [range(x, y+1) for x,y in zip(firstyear, lastyear)]
+    year = pd.Series([item for sublist in year_nested for item in sublist])
+
+    # Make multiple entries for each business active for >1 year
+    class_chunk2 = df.loc[np.repeat(df.index.values, df['YearsActive'])].reset_index(drop=True)
+
+    class_chunk2['Year'] = year
+    class_chunk2['Year'] = class_chunk2['Year']#.astype(int)
+
+    # Drop unessecary columns and set a MultiIndex
+    class_chunk2.drop(labels=['FirstYear', 'LastYear'], axis=1, inplace=True)
+    class_chunk2.set_index(['DunsNumber', 'Year'], drop=True, inplace=True)
+
+    # Clear duplicated years for businesses who changed SIC codes
+    class_chunk2 = class_chunk2[~class_chunk2.index.duplicated(keep='last')]
+    del class_chunk2['YearsActive']
+
+    return class_chunk2
