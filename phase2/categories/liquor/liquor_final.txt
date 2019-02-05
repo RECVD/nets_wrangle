@@ -1,0 +1,1 @@
+"\bLIQUOR(?:S|ETTE)?\b"

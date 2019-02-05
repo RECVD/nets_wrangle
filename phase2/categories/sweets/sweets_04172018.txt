@@ -1,0 +1,117 @@
+Name variable 'BKN'
+
+
+This set is ok as is:
+"BASKIN ROBBINS",
+"BASKIN-ROBBINS",
+"BASKIN-RBBINS",
+"BASKINROBBINS",
+"BASKIN & ROBBINS",
+"BASKIN ROBINS",
+"BASKINS ROBBINS",
+"BASKIN - ROBBINS",
+"DAIRY QUEEN",
+"DIARY QUEEN",
+"DQ GRILL",
+"JAMBA JUICE",
+"KRISPY KREME",
+"TCBY",
+"T C B Y",
+"COUNTRYS BEST YOGURT",
+"BEN & JERRYS",
+"BEN AND JERRYS",
+"CARVEL",
+"COLD STONE CREAMERY",
+"COLDSTONE CREAMERY",
+"HAAGEN-DAZS",
+"HAAGENDAZS",
+"HAAGEN DAZS",
+"HAAGEN - DAZS",
+"I CANT BELIEVE ITS YOGURT",
+"ICBY",
+"I C B Y",
+"AUNTIE ANNES",
+"CINNABON",
+"GREAT AMERICAN COOKIE",
+"GREAT AMRCN CHCLAT CHIP COOKIE",
+"COOKIE CO GREAT AMERICAN",
+"PRETZELTIME",
+"PRETZEL TIME",
+"PRETZELMAKER",
+"PRETZEL MAKER",
+"BRAUMS ICE CREAM",
+"BRAUM ICE CREAM",
+"BRAUM DAIRY",
+"BRAUMS DAIRY",
+"FRESH PREMIUM YOGURT",
+"FRESHENS",
+"MENCHIES",
+"ORANGE JULIUS",
+"PINKBERRY",
+"PINK BERRY",
+"RITAS ICE",
+"RITA ICE",
+"SMOOTHIE KING",
+"SWEETFROG",
+"SWEET FROG",
+"TASTEE FREEZ",
+"TASTEEFREEZ",
+"TASTEE-FREEZ",
+"TASTEE FREEZE",
+"TASTEEFREEZE",
+"TASTEE-FREEZE",
+"TROPICAL SMOOTHIE",
+"YOGURTLAND",
+"YOGURT LAND",
+
+
+This set needs to have the [S] to search both with and without an S on the end:
+"RITAS ITALIAN ICE",
+"RITAS WATER ICE",
+
+
+These below set may need to have a little more work or checking
+
+Mrs Field's cookies
+Currently searching ("MRS FIELDS",)
+Too much junk: MRS FIELDS LITERARY CLUB, MRS FIELDS PLUMBING & HEATING
+Maybe search:
+MRS FIELDS - with no other words or just number in name
+MRS FLDS ORIGINAL COOKIES
+
+
+Red Mango
+Currently searching ("RED MANGO",)
+May be picking up too much junk: RED MANGO BAKERY INC, RED MANGO HOME SOLUTIONS INC, RED MANGO MARKETING
+Maybe search:
+RED MANGO - with no other words or just number in name
+
+
+Stucky's
+Currently searching ("STUCKEYS",)
+May be picking up too much junk: STUCKEYS AUTO SALES, MS STUCKEYS CLASS, STUCKEYS AUTO REPAIR, STUCKEYS BAR & GRILL STU, STUCKEYS BATTERY & SMALL ENG, STUCKEYS LAWN & GARDEN
+Not sure exactly what to search on this one.
+
+
+Swensen's ice cream
+Currently searching ("SWENSENS ICE CREAM","SWENSEN ICE CREAM",)
+Maybe missing some that are listed with just SWENSENS and doesn't have ice cream in name.
+Maybe search
+SWENSENS - with no other words or just number in name
+SWENSENS ICE CREAM
+SWENSEN ICE CREAM
+SWENSONS ICE CREAM	
+SWENSENS OF
+
+
+Winchells donuts
+Currently searching ("WINCHELLS DONUT","WINCHELL DONUT",)
+Maybe missing some that are listed with just WINCHELLS and doesn't have donut in name.
+Maybe search
+WINCHELLS - with no other words or just number in name
+WINCHELLS DONUT[S]
+WINCHELL DONUT[S]
+WINCHLLS DNUT HSES
+W H BRAUM INC
+BRAUM W H INC
+	

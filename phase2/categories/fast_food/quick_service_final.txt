@@ -1,0 +1,89 @@
+"\bA ?& ?W",
+"\bARBY ?S\b",
+"\bBACK ?YARD BURGERS?\b",
+"\bBLIMP(?:I|E|IE)S?\b",
+"\bBOJANGLES\b",
+"\bBUR?GER KING\b",
+"\b(KARCHER CARL|CARL ?S (?:J(UNIO)?R|KARCHER))S?\b",
+"\bCAPT(?:AI|IA)NS? DS?\b",
+"\bCHARL(EYS?|IES) (?:PHILLY STEAK|GRILLED SUB)S?\b",
+"\bCHARLI(?:IE|EY)S STEAKERY\b",
+"^CHECKERS$|^CHECKERS (?:DRIVE|HAMBURGERS|OF|RESTAURANT|[0-9]+)\b",
+"\bCHESTERS?( FRIED)? CHICKEN\b",
+"\bCHI(?:(CK?)|F)\s*-?\s*FIL\s*-?\s*A\b",
+"\bCEC ENTERTAINMENT\b",
+"\bCIC? ?CIS?\b",
+"\bCHUCK E CHEESES?\b",
+"\bCHURCHS?( FRIED)? CHICKEN\b",
+"\bCULVERS\b",
+"^DEL TACO\b",
+"\bDOMINO[E ]?S|DOMINO PIZZA\b",
+"\bEL ?POLLO ?LOCO\b",
+"\bFOX(E|\s)?S? PIZZA\b",
+"\bFREDDY ?S? FRO?Z(EN)? CU?STARD\b",
+"\bGODFATHER( ?S)? PIZZA\b",
+"\bGOLDEN( FRIED)? CHICK(EN)?\b",
+"\bGREAT STEAK\s(&|AND)\s*POTATO\b",
+"\bHARDEE ?S(?! TRAVEL)\b",
+"\bHUNGRY HOWIE\b",
+"\bIN( |-)N( |-)OUT BURGERS?\b",
+"\bJACK[- ]IN([ -]THE)?[ -]BOX\b",
+"\bJACKS (HAMBURGERS|FAMILY RESTAURANT)\b",
+"\bJETS? PIZZA\b"
+"\bK(?:EN?T[UI]CK)?Y FR(?:IE)?D|K ?F ?C ?\b",
+"\bKRYSTAL (?:QUICK|KWIK|COMPANY|REST.*|HAMBURGERS|[0-9]+)\b",
+"\bLI(?:L|TTLE) (?:CAES[AE]RS?|CEA[SZ][EA]RS?|CSARS)\b",
+"\bLONG ?J(OH|HO)NS? SI?LVE?RS?\b",
+"\b(?<!MRS )MA?C ?DONALDS(?! GROCERY| FIXTURES| MEAT)\b",
+"\b(NEW WRLD CFFE/)?MANHATTAN BAGELS?\b",
+"\bMARCOS? PIZZA\b",
+"\bMAZZIOS? (?:ITALIAN|PIZZA|CORPORATION|LLC)\b",
+"\bMIAMI SUBS?\b",
+"\bMOUNTAIN MIKES?\b",
+"\b(MR GATTIS|GATTIS (?:FLA|PIZZA))\b",
+"\bMRS WI?NN?ERS?\b",
+"\bNATHANS FAMOUS\b",
+"\bPAPA GINOS?(?! ACQUISITION| SUB)\b",
+"\bP[AO]PP?AS? ?JOHNS?\b",
+"\bPAPA MURPHY ?S?\b",
+"\bPETER PIPER (?:PIZZA|INC)\b",
+"\bPIZZA HUT\b",
+"\bPIZZA RANCH\b",
+"\bPOPEYES?(?! PUB| SAIL| TAVERN| AUTO| (SNACK )?BAR)\b", 
+"\bP J UNITED INC\b",
+"\bPOT(?:BELLY| BELLY SANDWICH)\b",
+"\bQU?I(ZZ?N|NZ) ?I?OS?\b",
+"\bRALLYS\b",	
+"\bROLL?(?:IE|Y) POLL?(?:IE|Y)\b",
+"^ROUND ?TABLE$|\bROUND ?TABLE (?:PIZZA|REST)\b",
+"\bSARKU JAPAN\b",
+"\bS ?BARRO\b",
+"^SONIC$|\bSONIC (?:DRI?VE?[- ]?INN?S?|[0-9]+|AMERICAS|REST|OF)\b",
+"\bSTEAK ESCAPE\b",
+"\bSTEAK N SHAKE\b",
+"\bSUBWAY(?! DEV(ELOPMENT)?| MANAGEMENT| UNLIMITED| OFFICE)\b",
+"\bTACO ?BELL\b",
+"\bTACO TIME\b",
+"\bTACO JOHNS?\b",
+"\bTOGO ?S\b",
+"\bVILLA ((FRESH )?ITALIAN|PIZZA)\b",
+"\bWENDYS\b",
+"\bWHAT(?:\s|-)?A(?:\s|-)?(?:BURGER|CO)\b",
+"\bWHITE CASTLE(?! LOUNGE)\b",
+"\bW(IE|EI)R?NER ?SCH[NM]ITZE?L\b",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,15 @@
+2018_06_05 - Includes updated liquor SIC codes and all regex namesearch terms for non - TDlinx categories
+
+
+2018_06_15 - 	WAR, MHC were removed.
+		EAT was modified with new list of SIC codes in 'sic_range'
+		BAK changed to BKS
+		NAT: 54990900-54990999; 54993500-54993599 were removed since they don't exist as SIC codes in codebook so do not want to include them here in the
+			coding if we don't know what they are.
+	 	URG, HPC, DDS, SPS, MAG were replaced with new definition.
+		CFS, EEP, EAP, EAO, EEU, PBE, GAM, ARC, RCC, PLO, SLC, AMU, TOU, DRG, MHH, MHO, BHH, BHO, HOS, RTC, WRS were added.
+
+2018_06_21 
+		- Some sic ranges mistakenly ended like the following [58120000, 58130000] when they should be [58120000, 58129999] because the methods of interpretation are noninclusive. This was fixed
+		- More SIC codes were added for technomic eating places. Rather than [58120200, 58120202, 58120203, 58120204] exclusive, we take the range [58120000, 58130000].  This caused restructuring which deprecated usage of conditional 13, all uses of conditional 13 (CSD, BKN, CFN, FCS, QSV) were replaced with conditional 12 because the implementation of this new sic_range.
+		- name variants described in "additional name variants for jesse_060518.txt" were added

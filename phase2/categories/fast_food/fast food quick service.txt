@@ -1,0 +1,303 @@
+Name variable 'QSV'
+
+This set is ok as is:
+"ARBYS",
+"ARBY S",
+"BURGER KING",
+"BUGER KING",
+"CHARLEYS STEAKERY",
+"CHARLIES STEAKERY",
+"CHESTER FRIED CHICKEN",
+"CHESTERS FRIED CHICKEN",
+"CHESTERS CHICKEN",
+"CHICK FIL A",
+"CHICK-FIL-A",
+"CHICKFILA",
+"CHICK-FIL - A",
+"CHICK-FL-A",
+"CHICK-FIL A",
+"CHIK FIL A",
+"CHIKFILA",
+"CHIC FIL A",
+"CHIC-FIL-A",
+"CHIF-FIL-A",
+"CHIK-FIL-A",
+"CEC ENTERTAINMENT",
+"CHURCHS CHICKEN",
+"CHURCH CHICKEN",
+"CHURCHES FRIED CHICKEN",
+"CHURCHS FRIED CHICKEN",
+"CHURCH FRIED CHICKEN",
+"CULVERS",
+"EL POLLO LOCO",
+"EL POLLOLOCO",
+"ELPOLLOLOCO",
+"FOXS PIZZA DEN",
+"FOX PIZZA DEN",
+"FOX S PIZZA DEN",
+"FOXES PIZZA DEN",
+"FOXS PIZZA",
+"FREDDYS FROZEN CUSTARD",
+"FREDDY FROZEN CUSTARD",
+"FREDDY S FROZEN CUSTARD",
+"FREDDYS FRZ CSTARD",
+"GODFATHER PIZZA",
+"GODFATHERS PIZZA",
+"GODFATHER S PIZZA",
+"GOLDEN CHICK",
+"GOLDEN FRIED CHICKEN",
+"JET PIZZA",
+"JETS PIZZA",
+"MARCO PIZZA",
+"MARCOS PIZZA",
+"MAZZIO ITALIAN",
+"MAZZIOS ITALIAN",
+"MAZZIOS PIZZA",
+"MAZZIOS CORPORATION",
+"MAZZIOS LLC",
+"GATTIS FLA",
+"MR GATTIS",
+"GATTIS PIZZA",
+"NATHANS FAMOUS",
+"PAPA MURPHY S",
+"PETER PIPER PIZZA",
+"PETER PIPER INC",
+"PIZZA HUT",
+"PIZZA RANCH",
+"P J UNITED INC",
+"POT BELLY SANDWICH",
+"POTBELLY",
+"ROLY POLY",
+"ROLLIE POLLIE",
+"ROLLY POLLY",
+"SARKU JAPAN",
+"SBARRO",
+"S BARRO",
+"STEAK ESCAPE",
+"STEAK N SHAKE",
+"TACO BELL",
+"TACOBELL",
+"GREAT STEAK POTATO",
+"GREAT STEAK & POTATO",
+"GREAT STEAK AND POTATO",
+"TOGOS",
+"TOGO S",
+"WHATABURGER",
+"WHAT A BURGER",
+"WHATA BURGER",
+"WHAT ABURGER",
+"WHATA CO",
+"WHATACO",
+"WHAT-A-BURGER",
+"WIENERSCHNITZEL",
+"WIENERSCHITZEL",
+"WIENERSCHNITZL",
+"WIENER SCHNITVEL",
+"WIENERSCHMITZEL",
+"WIERNERSCHNITZEL",
+"WIENER SCHNITZEL",
+"WEINERSCHNITZEL",
+
+
+This set needs to have the [S] to search both with and without an S on the end:
+"BACK YARD BURGER",
+"BACKYARD BURGER",
+"CARL JR",
+"CARL S JR",
+"CARLS JR",
+"CARL KARCHER",
+"CARLS JUNIOR",
+"KARCHER CARL",
+"CHARLEYS PHILLY STEAK",
+"CHARLEY PHILLY STEAK",
+"CHARLEYS GRILLED SUB",
+"CHARLEY GRILLED SUB",
+"CHARLIES GRILLED SUB",
+"CHUCK E CHEESE",
+"CICI",
+"CI CI",
+"CICCI",
+"HUNGRY HOWIE",
+"IN N OUT BURGER",
+"IN-N-OUT BURGERS",
+"LONG JOHN SILVER",
+"LONG JHNS SLVR",
+"LONG JHON SILVER",
+"LONGJOHN SILVER",
+"MANHATTAN BAGEL",
+"NEW WRLD CFFE/MANHATTAN BAGELS",
+"MIAMI SUB",
+"MOUNTAIN MIKE",
+"MRS WINNER",
+"MRS WNNER",
+"MRS WINER",
+"PAPA JOHN",
+"PAPAS JOHN",
+"PAPA JOHN",
+"PAPAJOHN",
+"POPPA JOHN",
+"PAPA MURPHY",
+"QUIZNO",
+"QUINZO",
+"QUIZINO",
+"QUIZ NO",
+"QIZNO",
+"QUIZZNO",
+"TACO JOHN",
+
+
+These below set may need to have a little more work or checking
+
+A&W
+Currently searching "A & W",
+This is also picking up some things like "A & W B B Q & SEAFOOD REST", "A & W BARBECUE SEAFOOD REST", "A & W BURGER BARN", "A & W REFRIGERATION"
+that we don't want to include
+
+
+Blimpie
+Currently searching ("BLIMPIE","BLIMPE","BLIMPI")
+I think this at least needs an "S" on the end.
+It is also picking up a lot of junk names (BLIMPIE BASE, TGA BAGEL BLIMPIE & DONUTS, JERALDINES BLIMPIE RESTAURANT, LONG ISLAND BLIMPIE LEASING, SIMPLY BLIMPIE INC
+
+
+Bojangles
+Currently searching ("BOJANGLES",)
+There are some that are being pulled that we don't want to include (BOJANGLES SPORTS BAR, MISTER BOJANGLES INC, BOJANGLES BAR, BOJANGLES COFFEE & GIFTS,
+ BOJANGLES CONCESSIONS
+
+
+Captain Ds
+Currently searching ("CAPTAIN DS","CAPTAINS D","CAPTAIN D","CAPTIAN DS",)
+This seems fine in the trade name but may be including too many false in teh company name: CAPTAIN DS COMMISSARY, CAPTAIN DS FISHING INC, CAPTAIN DS GARAGE
+
+
+Checker's
+Currently searching ("CHECKERS",)
+I think this is picking up a lot of false location because too general (CHECKERS C L PUB & RESTAURANT, CHECKERS CABARET, CHECKERS CAFE, VIP SEASONS COAT CHECKERS INC)
+
+
+Del Taco
+Currently searching ("DEL TACO",)
+May pick up too many indie mexican - maybe don't include if have words in beginning?
+examples CASA DEL TACO, EL SABOR DEL TACO, LA CATEDRAL DEL TACO, MESON DEL TACO
+
+
+Dominos
+It appears that some have DOMINOS rather than DOMINOS PIZZA. If we take off the pizza part, does that pull too much?
+"DOMINOS",
+"DOMINO S",
+"DOMINOES",
+"DOMINOZ",
+
+
+Hardees
+Currenlty searching ("HARDEES","HARDEE S",)
+This seems fine in teh trade name. In the company name, may be getting too many false things: HARDEES CONSTRUCTION CO, HARDEES CUTTING EDGE LAWN,
+ HARDEES DEVILS LAKE INVESTMENT
+
+
+
+McDonalds
+Currently searching ("MCDONALDS","MC DONALDS","MC DONADS","MCDONLADS","MACDONALDS","MDDONALDS","MAC DONALDS","MCDONNALDS","MCDONLDS","MCDOLALDS",)
+May be picking up too much junk (for example: MCDONALDS ENGINE MACHINE, MCDONALDS EQUIPMENT, MCDONALDS GARAGE, MCDONALDS LANDSCAPE, OLD MACDONALDS CHICKEN FARM,
+OLD MCDONALDS E I E I O, MC DONALDS BARBEQUE)
+
+
+Jack's
+currently searching ("JACKS",)
+not sure what to include. Maybe
+"JACKS HAMBURGER",
+"JACKS CLASSIC HAMBURGERS",
+"JACKS HAMBURGERS",
+
+Jack in the box
+Currently searching ("JACK IN THE BOX","JACK IN BOX","JACK N BOX",)
+Also picking up junk like JACK IN BOX REAL ESTATE, JACK IN BOX CREATIONS, JACK IN BOX DAYCARE
+Will it work to only use JACK IN THE BOX?
+ADD JACK-IN-THE-BOX
+
+
+KFC
+Currently searching ("KENTUCKY FRIED CHICKEN","KFC","KENTUCKY FRD CHKN","KANTUCKY FRIED CHICKEN","KENTICKY FRIED CHICKEN","KETUCKY FRIED CHICKEN","KY FRIED CHICKEN",
+"KENTUCKY FRIED CHKN","KENTUCKY FRIED CHCKN","K F C","KY FRD CHKN","KENTUCKY FRIES CHICKEN",)
+There are some weird things being pulled like KFC ELECTRONICS, KFC HOME SELLERS, KFC MORTGAGE LOANS, KFC & ASSOCIATES INC, Y K F C INC
+
+
+
+Krystal
+Currently searching ("KRYSTAL",)
+May be picking up too much junk (for example: KRYSTAL KWIK, KRYSTAL CATERING, KELLYS KRYSTAL IMAGES, KRYSTAL BAKERY INC, KRYSTAL CAFE
+
+
+Little Caesar
+Currenlty searching ("LITTLE CAESARS","LITTLE CAESAR","LTTL CAESARS","LIL CAESARS","LITT CAESAR","LITTLE CEASARS","LITTLE CEAZARS","LITT CAESER","LTL CAESAR", 
+"LITTLE CEASAR S","LITTLE CEASAR","LITTLE CEASERS","LITTLE CAESERS",)
+Seems ok in the trade name. picking up junk in the company name: LITTLE CAESARS AMATEUR BASEBAL, LITTLE CEASAR PRODUCTIONS, LITTLE CEASARS DISCO
+ADD LITTLE CSARS PZZA STN IN KMART
+
+
+Papa Gino's
+I think a lot of these are listed as only "PAPA GINOS" but don't have the PIZZERIA as part of the name.
+May need to search for only "PAPA GINOS"?
+"PAPA GINO PIZZERIA",
+"PAPA GINOS PIZZERIA",
+
+
+Popeyes
+Currently searching ("POPEYES","POP EYES","POPPEYE S",)
+May be picking up too much like: POPEYES GALLEY & OARHOUSE, POPEYES SNACK BAR, POPEYES TAVERN, POPEYES AUTO, POPEYES CAFE, POPEYES MOVING COMPANY FLORIDA,
+ POPEYES PIZZA, CLAYS POPEYES BARBQUE
+
+
+Rally's
+I think some are listed as only "RALLYS" Need to check this.
+"RALLY HAMBURGER",
+"RALLYS HAMBURGER",
+also include
+RALLYS HAMBURGERS
+RALLYS
+RALLCO II INC
+RALLYS INC
+
+
+Round Table Pizza
+Currently searching ("ROUND TABLE",)
+If we change to ("ROUND TABLE PIZZA","ROUNDTABLE PIZZA",) - add PIZZA is this ok?
+Picking up things like: KING ARTHURS ROUND TABLE, KNIGHTS OF THE ROUND TABLE, CIVIL WAR ROUND TABLE
+
+
+Sonic
+Currently searching ("SONIC",)
+This is way too general of a term. Picks up things like SONIC ALCHEMY MUSIC, SONIC SUBS & DELI, SONIC WIRE SALES INC, UPS SONIC AIR, SONIC BOOM, SONIC BURRITOS INC
+
+
+Subway
+Currently searching ("SUBWAY","SUBWAY SANDWICHES","SUBWAY RESTAURANT",)
+I'm not sure that limiting to SUBWAY SANDWICHES is going to work to pick up the SUBWAY since a lot are just listed as SUBWAY in trade name.
+Need to figure this one out. in MESA we did a lot of exclusionary coding.
+
+Taco Time
+Currently searching ("TACO TIME",)
+Picking up things like CRAZY GEORGES TACO TIME, INDIAN TACO TIME & CRAFTS, ITS TACO TIME CAFE
+Search above but not with additional words in front of it?
+
+
+Villa Italian/Villa Pizza
+Currently searching ("VILLA FRESH ITALIAN","VILLA PIZZA",)
+Picking up things like DANS VILLA PIZZA, JOHNNIES VILLA PIZZA, ROMAN VILLA PIZZA, ANGELINAS VILLA PIZZA PASTA, BELLA VILLA PIZZA
+Search above but not with additional words in front of it?
+
+
+Wendy's
+Currently searching ("WENDYS","WENDY S",)
+Lots of problems
+
+
+White Castle
+Currenlty searching ("WHITE CASTLE",)
+Seems ok in the trade name but picking up a lot of junk in the company name: LA WHITE CASTLE MUSIC INC, WHITE CASTLE FISH & SNACK BAR, WHITE CASTLE LOUNGE, 
+ WHITE CASTLE PRODUCTION
+
+
+
+

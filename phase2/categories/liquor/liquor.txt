@@ -1,0 +1,30 @@
+	"LIQ" : {
+		"sic_range" : [59200000,
+			59299999],
+		"sic_range_2" : [01000000,
+			58129999,
+			58140000,
+			91999999,
+			93000000,
+			99999999],
+		"name" : "liquor"
+			"liquors"
+			"liquorette",
+		"conditional" : 7
+	},
+
+
+
+
+Can the word search work like we're doing for fast food, etc where it uses the word search for 'liquor', 'liquors', 'liquorette' but doesn't keep 
+words that have liquor as part of it (like won't keep 'liquori' - person's last name). I'm also not sure that I have the syntax right
+for keep liquor, liquors, liquorette
+
+And double check that the SIC searches are right:
+
+Keep all records in SIC codes 59200000-59299999
+If in the ranges of 01000000-58129999 or 58140000-91999999 or 93000000-99999999 and has the words liquor, liquors, liquorette
+
+So searching through all SIC codes except:
+58130000-58139999 (drinking places - on site alcohol so coded under bars; don't want to include in off premise alcohol)
+92000000-92999999 (justice, public order, safety - those w/word liquor here tend to be police enforcement boards)

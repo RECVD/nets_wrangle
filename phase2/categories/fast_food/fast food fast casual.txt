@@ -1,0 +1,201 @@
+Name variable 'FCS'
+
+This set is ok as is:
+"ATLANTA BREAD",
+"AU BON PAIN",
+"A B P CPATION",
+"AU BON TAIN",
+"ABP CORP",
+"A B P CORP",
+"ABP CORPORATION",
+"BAJA FRESH",
+"BOSTON MARKET",
+"CAFE RIO",
+"CHIPOTLE",
+"CHIPOLTE",
+"COSI",
+"DICKEY BARBECUE",
+"DICKEYS BARBECUE",
+"DICKEYS BBQ",
+"DICKEY BBQ",
+"DICKEYS BARBEQUE",
+"DICKEY BARBEQUE",
+"DELOPS INC",
+"DONATO PIZZA",
+"DONATOS PIZZA",
+"DONATOS PIZZERIA",
+"DONATO PIZZERIA",
+"EINSTEIN AND NOAH CORP",
+"EINSTEIN NOAH REST GROUP",
+"FARMER BOYS",
+"FREEBIRD WORLD BURRITO",
+"FREEBIRDS WORLD BURRITO",
+"GREAT HARVEST BREAD",
+"HEAVENLY HAM",
+"JASON S DELI",
+"JASON DELI",
+"JASONS DELI",
+"ROGERS KENNY ROASTERS",
+"KENNY ROGERS ROASTERS",
+"LE PAIN QUOTIDIEN",
+"MCALISTER DELI",
+"MCALISTERS DELI",
+"MC ALISTER DELI",
+"MC ALISTERS DELI",
+"MCALISTERS GOURMET DELI",
+"MOES SOUTHWEST",
+"MOES SW",
+"MOE S SOUTHWEST",
+"MOE S SW",
+"MOES SOUTH WEST",
+"MOES SOUTHWESTERN",
+"NEWK EATERY",
+"NEWKS EATERY",
+"NEWKS EXPRESS CAFE",
+"NEWK EXPRESS CAFE",
+"NOAHS PACIFIC LLC",
+"NOODLES & COMPANY",
+"NOODLES COMPANY",
+"NOODLES AND COMPANY",
+"NOODLES & CO",
+"NOODLES AND CO",
+"NOODLES INC",
+"PANDA EXPRESS",
+"PANDA RESTAURANT GROUP",
+"PANDA MANAGEMENT COMPANY",
+"PANERA",
+"PARADISE BAKERY",
+"PEI WEI",
+"PICCADILLY CIRCUS PIZZA",
+"PICCADILLY PIZZA",
+"PICK UP STIX",
+"PIK UP STIX",
+"PIZZA PRO",
+"POLLO TROPICAL",
+"POLLO TROPCIAL",
+"POLLO OPERATIONS INC",
+"PORTILLO HOT",
+"PORTILO HOT",
+"PORTILLOS HOT",
+"PRET A MANGER",
+"QDOBA",
+"RUBIO BAJA",
+"RUBIOS BAJA",
+"RUBIOS FRESH MEXICAN GRILL",
+"RUBIOS RESTAURANTS INC",
+"SHAKE SHACK",
+"SKYLINE CHILI",
+"SMASHBURGER",
+"SMASH BURGER",
+"ST LOUIS BREAD",
+"TACO BUENO",
+"TIJUANA FLATS",
+"WHICH WICH",
+"WINGSTOP",
+"WING STOP",
+"ZAXBYS",
+"ZOES KITCHEN",
+"ZOE KITCHEN"
+
+
+This set needs to have the [S] to search both with and without an S on the end:
+"BIG APPLE BAGEL",
+"BRUGGER",
+"BRUEGGER",
+"BRUEGER",
+"COUSIN SUB",
+"COUSINS SUB",
+"COUSINS SUBMARINE";
+"COUSIN SUBMARINE";
+"D ANGELO SANDWICH",
+"D ANGELOS SANDWICH",
+"DANGELO SANDWICH",
+"DANGELOS SANDWICH",
+"D ANGELO GRILLED SANDWICH",
+"D ANGELOS GRILLED SANDWICH",
+"DANGELO GRILLED SANDWICH",
+"DANGELOS GRILLED SANDWICH",
+"EINSTEIN BRO",
+"EINSTEIN BAGEL",
+"EINSTIEN BRO",
+"EINSTIEN BAGEL",
+"EINSTEIN BROTHER",
+"EINSTEIN/NOAH BAGEL",
+"FAZOLI",
+"FIREHOUSE SUB",
+"FIRE HOUSE SUB",
+"FUDDRUCKER",
+"FUDRUCKER",
+"JERSEY MIKE",
+"JIMMY JOHN",
+"JIMMY JON",
+"JMMI JOHN",
+"JMMY JOHN",
+"JIMMY JHN",
+"NOAH BAGEL",
+"NOAHS BAGEL",
+"NOAHS NEW YORK BAGEL",
+"RAISING CANE",
+"SCHLOTZSKY",
+"SCHLOTSKY",
+"SCHLLTZSKYS",
+"SCHLOTSKI",
+"HABIT BURGER",
+"HABIT RESTAURANT",
+
+
+These below set may need to have a little more work or checking
+
+Corner Bakery
+Right now this is picking up things like "BEROS CORNER BAKERY", "GINNYS CORNER BAKERY", "AROUND CORNER BAKERY", "CAKE CORNER BAKERY CORP", "COZY CORNER BAKERY INC"
+Include the following
+"CORNER BAKERY", - but not with additional words in front of it?
+"MAGGIANOS / CORNER BAKERY",
+"MAGGIANOS CORNER BAKERY",
+
+
+Five Guys
+Currenlty searching ("FIVE GUYS",)
+May be picking up too much: FIVE GUYS & DOG INC, FIVE GUYS CATERING, FIVE GUYS FIGHTING INC, FIVE GUYS PIZZA
+Maybe include as "FIVE GUYS BURGERS"?
+
+
+La Salsa Fresh
+"LA SALSA FRESH",
+"LA SALSA INC",	Owner of LA SALSA FRESH (https://www.bloomberg.com/research/stocks/private/snapshot.asp?privcapid=30637)
+"LA SALSA",	In trade name with no other words in the field - will pick up too many indie mexican restaurants if use 'LA SALSA' with additional words
+
+La Madeleine
+Currently searching ("LA MADELEINE","LA MADELINE","LE MADELEINE",)
+Picking up LA MADELEINE INN - is there a way to exclude?
+
+
+Penn Station Subs
+"PENN STATION SUB",
+"PENN STATION INC",
+"PENN STATION EAST COAST SUBS",
+"PENN STATION",	This may need to search for penn station alone but not sure if that's going to pick up too many things that are in train station
+"PENN STATION STEAK & SUBS",
+
+
+Pizza Inn
+Right now this is picking up things like "ABBYS PIZZA INN", "GINOS PIZZA INN" that are more independent places with some person's name 
+that we don't want to pick up here.
+Need to determine if there is a better way to get PIZZA INN and being only those that are the chain.
+"PIZZA INN",
+
+
+Shakey's pizza
+Currently searching "SHAKEYS",
+Picking up too many things: SHAKEYS FROZEN CUSTARD, SHAKEYS CATERING, CAPTN SHAKEYS INC, SHAKEYS AUTO
+Maybe search
+"SHAKEYS INC",
+"SHAKEYS INCORPORATED",
+"SHAKEYS PIZZA",
+
+
+Taco Cabana
+Currently searching "TACO CABANA", 
+Possible to exclude EL TACO CABANA, TROPICANA TACO CABANA -indie places?
+
+
