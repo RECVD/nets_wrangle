@@ -1,5 +1,5 @@
 # nets_wrangle
-Wrangling original NETS files to aid in transformation of the NETS data for the RECVD project.
+Wrangling original NETS files to aid in transformation of the NETS data for the RECVD project. **Note: this code is somewhat convoluted and difficult to follow.  It was intended to be replaced by the `nets_clean` repo, which is unifinished. **
 
 ## File Descriptions  
 
